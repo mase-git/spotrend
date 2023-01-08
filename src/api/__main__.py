@@ -1,5 +1,3 @@
-from utils.checker import Checker
-from utils.formatter import Formatter
 from utils.spreadsheet import SpredsheetWriter
 from tracker import Tracker
 import pandas as pd
@@ -8,9 +6,7 @@ import sys
 # main tracker
 tracker = Tracker(limit=50)
 
-# utilities objects
-formatter = Formatter()
-checker = Checker()
+# utilities object
 spreadsheet = SpredsheetWriter()
 
 lst_artists = tracker.get_artists_names()

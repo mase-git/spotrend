@@ -2,7 +2,7 @@ import spotipy
 import pandas as pd
 from utils.checker import Checker
 from spotipy.oauth2 import SpotifyClientCredentials
-
+from environment import Environment as env
 
 # credentials for the Spotify API usage, you must set SPOTIPY_CLIENT_ID and SPOTIFY_CLIENT_SECRET
 client_credentials_manager = SpotifyClientCredentials()
@@ -26,8 +26,8 @@ class Tracker():
         """
         Initializes a Tracker object.
         """
-        self.artists_url = 'https://drive.google.com/file/d/1ER-uBsnffjsGRjheptpPTPh6VN3tegJ1/view?usp=sharing'
-        self.artists_url = 'https://drive.google.com/uc?id=' + \
+        self.artists_url = env.env_artist_url
+        self.artists_url = env.env_prefix_url + \
             self.artists_url.split('/')[-2]  # format the drive url
         self.limit = limit
         self.checker = Checker()
