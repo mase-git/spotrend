@@ -1,7 +1,9 @@
-from dotenv import load_dotenv
-import spotipy, os
 
-# load .env
+from dotenv import load_dotenv
+import spotipy
+import os
+
+# load dotenv
 load_dotenv()
 
 # setting credentials
@@ -12,6 +14,7 @@ client_credentials_manager = spotipy.oauth2.SpotifyClientCredentials(
 
 # global spotipy object
 sp = spotipy.Spotify(client_credentials_manager=client_credentials_manager)
+
 
 class Spotrends():
 
