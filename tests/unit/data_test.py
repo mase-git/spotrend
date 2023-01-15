@@ -12,7 +12,7 @@ def return_expected_a_key():
 class SpotrendsTest(unittest.TestCase):
 
     def setUp(self):
-        self.st = Spotrends(0, 1)
+        self.st = Spotrends() # offset 0 and limit 1
         self._expected_a_key = return_expected_a_key()
         self._expected_a_vals = return_expected_a_vals()
 
