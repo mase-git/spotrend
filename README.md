@@ -6,7 +6,7 @@
 [![build](https://github.com/mase-git/spotrends/workflows/build/badge.svg)](https://github.com/mase-git/spotrends/actions?query=workflow:"build")
 [![issues - spotrends](https://img.shields.io/github/issues/mase-git/spotrends)](https://github.com/mase-git/spotrends/issues)
 [![License](https://img.shields.io/badge/License-GNU_3.0-blue)](#license)
-# Spotrends
+# Spotrend
 
 ## Documentation
 ## Installation
