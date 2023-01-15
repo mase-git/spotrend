@@ -1,5 +1,5 @@
 <div align="center">
-  <img width="600px" src="https://i.ibb.co/1T2TX8j/logo.png") />
+  <img width="600px" src="https://user-images.githubusercontent.com/121885783/212549809-136e2c72-aae6-42e8-bfb6-52d714a4c589.png" />
 </div>
 
 [![Language - Python](https://img.shields.io/static/v1?label=Python&message=3.8&color=blue&logo=github)](https://github.com/mase-git/spotrends "Go to GitHub repo")
