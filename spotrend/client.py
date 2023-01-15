@@ -4,7 +4,7 @@ import spotipy
 import logging
 import os
 
-from exceptions import SpotrendsInputException
+from spotrend.exceptions import SpotrendsInputException
 
 # load dotenv
 load_dotenv()

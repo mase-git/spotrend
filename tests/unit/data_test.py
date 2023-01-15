@@ -1,7 +1,7 @@
 import unittest
 from unittest.mock import patch
-from spotrends.client import Spotrends
-from spotrends.exceptions import SpotrendsInputException
+from spotrend.client import Spotrends
+from spotrend.exceptions import SpotrendsInputException
 
 def return_expected_a_vals():
     return [str, int, list, str, str, str, int, str, str]
