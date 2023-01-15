@@ -3,7 +3,6 @@
 </div>
 
 [![Language - Python](https://img.shields.io/static/v1?label=Python&message=3.8&color=blue&logo=github)](https://github.com/mase-git/spotrends "Go to GitHub repo")
-[![build](https://github.com/mase-git/spotrends/workflows/build/badge.svg)](https://github.com/mase-git/spotrends/actions?query=workflow:"build")
 [![issues - spotrends](https://img.shields.io/github/issues/mase-git/spotrends)](https://github.com/mase-git/spotrends/issues)
 [![License](https://img.shields.io/badge/License-GNU_3.0-blue)](#license)
 # Spotrend
