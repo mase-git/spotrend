@@ -198,19 +198,49 @@ class Spotrends():
 
 
     def features_by_track_id(self, track_id : str):
-        pass
+        if track_id is None:
+            logging.warning('features_by_track_id() call with null id returns always a None collection')
+            return None
+        try:
+            name = self.track_name_by_id(track_id)
+            if name is None:
+                logging.warning('features_by_track_id() call with invalid id returns always a None collection')
+                return None
+            data = self._sp.audio_features(tracks=[track_id])
+            data['track_name'] = name
+            return data
+        except ValueError:
+            logging.error('Invalid track id: ' + track_id + '. Please, try with a valid value.')
+            raise SpotrendsInputException('Invalid track id: ' + track_id + '. Please, try with a valid value.')
 
 
-    def features_by_track_name(self, track_id : str):
-        pass
+    def features_by_track_name(self, track_name: str, artist_name : str):
+        if track_name is None or artist_name is None:
+            logging.warning('features_by_track_name() call with null track or artist name returns always a None collection')
+            return None
+        try:
+            track_id = self.track_id_by_name(track_name, artist_name)
+            return self.features_by_track_id(track_id)
+        except ValueError:
+            logging.error('Invalid track or artist name. Please, try with a valid value.')
+            raise SpotrendsInputException('Invalid track or artist name. Please, try with a valid value.')
+        except spotipy.exceptions.SpotifyException:
+            logging.error('Invalid track or artist name. Please, try with a valid value.')
+            raise SpotrendsInputException('Invalid track or artist name. Please, try with a valid value.')
     
 
-    def features_by_track_ids(self, tracks_id : list):
-        pass
-
-
-    def features_by_tracks_names(self, tracks_id : list):
-        pass
+    def features_by_tracks_ids(self, tracks_ids : list):
+        if tracks_ids is None or len(tracks_ids) == 0:
+            logging.warning('features_by_tracks_ids() calls with null list returns always None element')
+            return None 
+        features = {}
+        for track_id in tracks_ids:
+            try:
+                features[track_id] = self.features_by_track_id(track_id)
+            except SpotrendsInputException:
+                logging.warning('Invalid data for the current id: ' + track_id)
+                continue
+        return features
 
 
     def artist_id_by_name(self, artist_name : str):
@@ -236,6 +266,17 @@ class Spotrends():
         except spotipy.exceptions.SpotifyException:
             raise SpotrendsInputException('Invalid artist id: ' + artist_id + '. Try with another one.')
 
+    def track_name_by_id(self, track_id : str):
+        if track_id == None:
+            logging.warning('track_name_by_id() call with None artist_id could return void data.')
+            return None
+        try:
+            info = self._sp.track(track_id)
+            return info['name']
+        except ValueError:
+            raise SpotrendsInputException('The track id ' + track_id + ' unreachable')
+        except spotipy.exceptions.SpotifyException:
+            raise SpotrendsInputException('Invalid track id: ' + track_id + '. Try with another one.')
 
     def track_id_by_name(self, track_name : str, artist_name : str):
         if track_name is None or artist_name is None:
@@ -329,3 +370,5 @@ class Spotrends():
             raise SpotrendsInputException('Error type data. Type parameter must be artist, track or album.')
 
 
+sp = Spotrends()
+sp.track_name_by_id("spotify:track:6rqhFgbbKwnb9MLmUQDhG6")
