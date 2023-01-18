@@ -46,8 +46,8 @@ class Spotrends():
     
 
     def artist_info_by_id(self, artist_id: str):
-        if artist_id is None:
-            logging.warning('artist_info_id() call with None artist_id could return void data.')
+        if artist_id is None or artist_id == "":
+            logging.error('artist_info_id() call with None artist_id could return void data.')
             return None
         try:
             raw = self._sp.artist(artist_id)
@@ -58,12 +58,15 @@ class Spotrends():
 
 
     def artist_info_by_name(self, artist_name : str):
+        if artist_name is None or artist_name == "":
+            logging.error('artist_info_name() call with None artist_name could return void data.')
+            return None
         return self.artist_info_by_id(self.artist_id_by_name(artist_name))
 
     
     def track_info_by_id(self, track_id : str):
-        if track_id is None:
-            logging.warning('track_info_by_id() call with None track_id could return void data.')
+        if track_id is None or track_id == "":
+            logging.error('track_info_by_id() call with None track_id could return void data.')
             return None
         try:
             raw = self._sp.track(track_id)
@@ -77,7 +80,7 @@ class Spotrends():
         if track_name is None or artist_name is None:
             logging.warning('The track and related artist name must be specified in input or the result will be None.')
             return None
-        return self.artist_info_by_id(self.track_id_by_name(track_name, artist_name))
+        return self.track_info_by_id(self.track_id_by_name(track_name, artist_name))
 
 
     def tracks_by_artist_id(self, artist_id : str, limit=10, offset=0):
@@ -88,8 +91,8 @@ class Spotrends():
             logging.warning('Limit exceed. Maximum value is 50.')
             raise SpotrendsInputException('Limit exceed. Maximum value is 50.')
         artist_name = self.artist_name_by_id(artist_id)
-        raw = self._sp.search(artist_name, limit=limit, offset=offset)
-        data = {"tracks" : [self._format('track', track) for track in raw['tracks']['item']]}
+        raw = self._sp.search(q=artist_name, type='track', limit=limit, offset=offset)
+        data = {"tracks" : [self._format('track', track) for track in list(raw['tracks']['items'])]}
         # adding artist metadata for information binding 
         data['metadata'] = {'lenght' : len(data['tracks']), 'type' : 'track', 'artist_name' : artist_name, 'artist_id' : artist_id}
         return data
@@ -116,7 +119,7 @@ class Spotrends():
         for id in artists_ids:
             try:
                 data['artists'].append(self.artist_info_by_id(id))
-            except SpotrendsInputException:
+            except ValueError:
                 logging.warning('The id ' + id + ' is unreachable or invalid. Please provides a correct one.')
             finally:
                 return data
@@ -337,7 +340,6 @@ class Spotrends():
             sample['total_duration_ms'] = sum([x['duration_ms'] for x in sample['tracks']])
             return sample
         elif type.lower() == 'artist':
-            sample['spotify_url'] = data['external_urls']['spotify']
             sample['followers'] = data['followers']['total']
             sample['genres'] = data['genres']
             sample['id'] = data['id']
@@ -368,8 +370,4 @@ class Spotrends():
         else:
             logging.error('Error type - mismatch type from raw data type, expected track, album or artist.')
             raise SpotrendsInputException('Error type data. Type parameter must be artist, track or album.')
-
-
-sp = Spotrends()
-sp.track_name_by_id("spotify:track:6rqhFgbbKwnb9MLmUQDhG6")
 
