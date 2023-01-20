@@ -415,4 +415,4 @@ class Spotrend():
 
 
 sp = Spotrend()
-print(sp.artist_info_by_id("spotify:artist:2WX2uTcsvV5OnS0inACecP")['name'])
+print(sp.track_info_by_id("spotify:track:6rqhFgbbKwnb9MLmUQDhG6")['name'])

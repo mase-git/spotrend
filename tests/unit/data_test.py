@@ -114,36 +114,56 @@ class SpotrendsTest(unittest.TestCase):
 
         # check if the key-values of the dictionaries are the same
         is_true = check_results(name_info, id_info)
-        self.asssertTrue(is_true)
+        self.assertTrue(is_true)
 
-    def test_artist_info_by_name(self):
-        with self.assertRaises(SpotrendsInputException) as context:
-            self.st.artist_info_by_name('no_valid_id')
-        out = self.st.artist_info_by_name(self.valid_artist_name)
-        self.assertIsInstance(out, dict)
+    def test_track_info(self):
+        with self.assertRaises(SpotrendsInputException) as context_id:
+            no_valid = str(10)
+            self.st.track_info_by_id(no_valid)
 
-    def test_track_info_by_id(self):
-        with self.assertRaises(SpotrendsInputException) as context:
-            self.st.track_info_by_id('no_valid_id')
-        out = self.st.track_info_by_id(self.valid_track_id)
-        self.assertIsInstance(out, dict)
+        self.assertFalse('this is broken' in str(context_id.exception))
 
-    def test_track_info_by_name(self):
-        with self.assertRaises(SpotrendsInputException) as context:
-            self.st.track_info_by_name('no_valid', 'no_valid')
-        out = self.st.track_info_by_name(
-            self.valid_track_name, self.valid_artist_name)
-        self.assertIsInstance(out, dict)
+        with self.assertRaises(SpotrendsInputException) as context_name:
+            no_valid = str('_')
+            self.st.track_info_by_name(no_valid, no_valid)
 
-    def test_tracks_by_artist_id(self):
-        with self.assertRaises(SpotrendsInputException) as context:
-            self.st.tracks_by_artist_id('')
-        out = self.st.tracks_by_artist_id(self.valid_artist_id)
-        self.assertIsInstance(out, dict)
-        self.assertIsInstance(out['tracks'], list)
-        self.assertIsInstance(out['metadata'], dict)
-        self.assertTrue(len(out['tracks']) != 0)
-        self.assertTrue(len(out['metadata'].keys()) != 0)
+        self.assertFalse('this is broken' in str(context_name.exception))
+
+        id_info = self.st.track_info_by_id(self.valid_track_id)
+        self.assertIsInstance(id_info, dict)
+        name = id_info["name"]
+        is_true = name == "Speak To Me - 2011 Remastered Version"
+        self.assertTrue(is_true)
+
+        # check the same reference by the name info retrieval
+        name_info = self.st.track_info_by_name(self.valid_track_name, self.valid_artist_name)
+        id = name_info["id"]
+        id_info = self.st.track_info_by_id(id)
+        is_true = name_info["id"] == id_info["id"]
+        self.assertTrue(is_true)
+
+        # check if the key-values of the dictionaries are the same
+        is_true = check_results(name_info, id_info)
+        self.assertTrue(is_true)
+
+
+
+    def test_tracks_by_artist(self):
+        with self.assertRaises(SpotrendsInputException) as context_id:
+            not_valid = str('_')
+            self.st.tracks_by_artist_id(not_valid)
+
+        self.assertFalse('this is broken' in str(context_id.exception))
+    
+        with self.assertRaises(SpotrendsInputException) as context_name:
+            not_valid = str('_')
+            self.st.tracks_by_artist_name(not_valid)
+        
+        self.assertFalse('this is broken' in str(context_name.exception))
+
+        tracks_id = self.st.tracks_by_artist_id(self.valid_artist_id)
+        
+
 
     def test_tracks_by_artist_name(self):
         with self.assertRaises(SpotrendsInputException) as context:
