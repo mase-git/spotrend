@@ -25,6 +25,14 @@ client_credentials_manager = spotipy.oauth2.SpotifyClientCredentials(
 class Spotrend():
 
     def __init__(self, offset=0, limit=1, client_id=None, client_secret=None):
+
+        """
+        Create Spotrend Client instance
+        :param offset : int : number of element to exclude in the ordered output collection
+        :param limit : int : number of result for collection output 
+        :param client_id : str : id of the client for the spotipy credentials
+        :param client_secret : str : secret key of the client for the spotify credentials
+        """
         self._client_id = _client_id
         self._client_secret = _client_secret
         if client_id is not None:
@@ -39,6 +47,11 @@ class Spotrend():
         self.limit = 1
 
     def oauth2(self, client_id, client_secret):
+        """ define  the oauth2 credentials for the Spotipy and Spotify API calls
+            Parameters:
+                - client_id : str - the id of the client for the oauth2 authorization
+                - client_secret : str - the secret key of the client for the oauth2 authorization
+        """
         self._client_id = client_id
         self._client_secret = client_secret
         client_credentials_manager = spotipy.oauth2.SpotifyClientCredentials(
@@ -47,6 +60,10 @@ class Spotrend():
             client_credentials_manager=client_credentials_manager)
 
     def artist_info_by_id(self, artist_id: str):
+        """ return info about the artist with the id specified in input
+            Parameters:
+                - artist_id : str - the id of the artist
+        """
         if artist_id is None or artist_id == "":
             logging.error(
                 'artist_info_id() call with None artist_id could return void data.')
@@ -61,6 +78,10 @@ class Spotrend():
                 'Id ' + artist_id + ' invalid. Try with another value.')
 
     def artist_info_by_name(self, artist_name: str):
+        """ return info about the artist with the name specified in input
+            Parameters:
+                - artist_name : str - the name of the artist
+        """
         if artist_name is None or artist_name == "":
             logging.error(
                 'artist_info_name() call with None artist_name could return void data.')
@@ -68,6 +89,10 @@ class Spotrend():
         return self.artist_info_by_id(self.artist_id_by_name(artist_name))
 
     def track_info_by_id(self, track_id: str):
+        """ return info about the track with the id specified in input
+            Parameters:
+                - track_id : str - the id of the track 
+        """
         if track_id is None or track_id == "":
             logging.error(
                 'track_info_by_id() call with None track_id could return void data.')
@@ -81,6 +106,10 @@ class Spotrend():
                 'Id ' + track_id + ' invalid. Try with another value.')
 
     def track_info_by_name(self, track_name: str, artist_name: str):
+        """ return info about the track with the name specified in input
+            Parameters:
+                - track_name : str - the name of the track 
+        """
         if track_name is None or artist_name is None:
             logging.warning(
                 'The track and related artist name must be specified in input or the result will be None.')
@@ -88,6 +117,12 @@ class Spotrend():
         return self.track_info_by_id(self.track_id_by_name(track_name, artist_name))
 
     def tracks_by_artist_id(self, artist_id: str, limit=10, offset=0):
+        """ return a list of tracks info about the tracks of the artist id specified in input
+            Parameters:
+                - artist_id : str - the id of the main artist of the list of tracks
+                - limit : int - a limit for the cardinality of the output collection, defaault: 10
+                - offset : int - offset to shift result collection by n units, default : 0
+        """
         if artist_id is None:
             logging.warning(
                 'tracks_by_artists_id() call with None artist_id could return void data.')
@@ -106,31 +141,51 @@ class Spotrend():
         return data
 
     def tracks_by_artist_name(self, artist_name: str, limit=10, offset=0):
+        """ return a list of tracks info about the tracks of the artist name specified in input
+            Parameters:
+                - artist_name : str - the name of the main artist of the list of tracks
+                - limit : int - a limit for the cardinality of the output collection, defaault: 10
+                - offset : int - offset to shift result collection by n units, default : 0
+        """
         artist_id = self.artist_id_by_name(artist_name)
         return self.tracks_by_artist_id(artist_id, limit=limit, offset=offset)
 
     def tracks_by_ids(self, tracks_ids: list):
-
+        """ return a list of tracks info about the id of tracks given in input
+            Parameters:
+                - tracks_ids : list - a collection of id related to the tracks 
+        """
         data = {'tracks': []}
         tracks_ids = list(set(tracks_ids))
         for id in tracks_ids:
             try:
                 data['tracks'].append(self.track_info_by_id(id))
             except HTTPError:
-                raise SpotrendsInputException('Track id: ' + id + ' is invalid.')
+                raise SpotrendsInputException(
+                    'Track id: ' + id + ' is invalid.')
         return data
 
     def artists_by_ids(self, artists_ids: list):
+        """ return a list of artists info about the id of artists given in input
+            Parameters:
+                - artists_ids : list - a collection of id related to the artists
+        """
         data = {'artists': []}
         artists_ids = list(set(artists_ids))
         for id in artists_ids:
             try:
                 data['artists'].append(self.artist_info_by_id(id))
             except HTTPError:
-                raise SpotrendsInputException('Artist id: ' + id + ' is invalid.')
+                raise SpotrendsInputException(
+                    'Artist id: ' + id + ' is invalid.')
         return data
 
     def tracks_by_names(self, tracks_names: list, artist_name: str):
+        """ return a list of tracks info about the name of tracks and the related artist given in input
+            Parameters:
+                - tracks_names : list - a collection of names related to the tracks 
+                - artist_name : str - the name of the main artist who made the tracks, so the collection is strictly related to a single artist
+        """
         if artist_name is None or tracks_names is None or len(tracks_names) == 0:
             logging.warning(
                 'Invalid input value return always a void dictionary.')
@@ -139,6 +194,10 @@ class Spotrend():
         return {'tracks': [self.track_info_by_name(track_name=name, artist_name=artist_name) for name in tracks_names]}
 
     def artists_by_names(self, artists_name: list):
+        """ return a list of artists info about the names of artists given in input
+            Parameters:
+                - artists_names : list - a collection of names related to the artists
+        """
         if artists_name is None or len(artists_name) == 0:
             logging.warning(
                 'Invalid input, you must specified a no void list of artists names or the output is None.')
@@ -146,6 +205,10 @@ class Spotrend():
         return {'artists': [self.artist_info_by_name(name) for name in artists_name]}
 
     def album_info_by_id(self, album_id: str):
+        """ return info about the album with the id specified in input
+            Parameters:
+                - album_id : str - the id of the album
+        """
         if album_id is None:
             logging.warning(
                 'track_info_by_id() call with None track_id could return void data.')
@@ -159,9 +222,19 @@ class Spotrend():
                 'Id ' + album_id + ' invalid. Try with another value.')
 
     def album_info_by_name(self, album_name: str, artist_name: str):
+        """ return info about the album with the name specified in input
+            Parameters:
+                - album_name : str - the name of the album
+        """
         return self.album_info_by_id(self.album_id_by_name(album_name, artist_name))
 
     def albums_by_artist_id(self, artist_id: str, limit=10, offset=0):
+        """ return info about the album with the artist id specified in input
+            Parameters:
+                - artist_id : str - the id of the artist
+                - limit : int - a limit for the cardinality of the output collection, defaault: 10
+                - offset : int - offset to shift result collection by n units, default : 0
+        """
         if artist_id is None:
             logging.warning(
                 'tracks_by_artists_id() call with None artist_id could return void data.')
@@ -180,10 +253,20 @@ class Spotrend():
         return data
 
     def albums_by_artist_name(self, artist_name: str, limit=10, offset=0):
+        """ return info about the album with the artist name specified in input
+            Parameters:
+                - artist_name : str - the name of the artist
+                - limit : int - a limit for the cardinality of the output collection, defaault: 10
+                - offset : int - offset to shift result collection by n units, default : 0
+        """
         artist_id = self.artist_id_by_name(artist_name)
         return self.albums_by_artist_id(artist_id, limit=limit, offset=offset)
 
     def albums_by_ids(self, albums_ids: list):
+        """ return a list of albums info about the id of albums given in input
+            Parameters:
+                - albums_ids : list - a collection of id related to the albums
+        """
         data = {'albums': []}
         for id in albums_ids:
             try:
@@ -195,9 +278,15 @@ class Spotrend():
                 return data
 
     def available_markets(self):
+        """ return the list of available markets on Spotify
+        """
         return self._sp.available_markets()['markets']
 
     def images_by_artists_id(self, artists_id: list):
+        """ return images info about the collection of artists ids specified in input
+            Parameters:
+                - artist_id : list - the ids of the artists
+        """
         if artists_id == None or len(artists_id) == 0:
             logging.error(
                 'images_by_artists_id() call with None artists_id length equals to 0 or null list, it could return void data.')
@@ -211,6 +300,10 @@ class Spotrend():
         return images
 
     def images_by_artists_names(self, artists_names: list):
+        """ return images info about the collection of artists names specified in input
+            Parameters:
+                - artist_names : list - the names of the artists
+        """
         if artists_names == None or len(artists_names) == 0:
             logging.error(
                 'images_by_artists_id() call with None artists_id length equals to 0 or null list, it could return void data.')
