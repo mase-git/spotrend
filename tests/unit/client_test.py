@@ -453,21 +453,72 @@ class SpotrendsTest(unittest.TestCase):
     
 
     def test_features_by_track(self):
-        pass
+        id = self.st.track_id_by_name(self.valid_track_name, self.valid_artist_name)
+
+        # check void
+        void = self.st.features_by_track_id(None)
+        void_2 = self.st.features_by_track_name(None, None)
+        self.assertTrue(void == void_2 and void_2 == None)
+
+        # retrieve info
+        feat_name = self.st.features_by_track_name(self.valid_track_name, self.valid_artist_name)
+        feat_id = self.st.features_by_track_id(id)
+
+        # check structure
+        res = check_results(feat_name, feat_id)
+        self.assertTrue(res)
 
 
-    def test_features_by_tracks_id(self):
-        pass
+
+    def test_artist_id_name_change(self):
+        # find the name
+        name = self.st.artist_name_by_id(self.valid_artist_id)
+        self.assertIsNotNone(name)
+
+        # find the id
+        id = self.st.artist_id_by_name(name)
+        self.assertEqual(id, self.valid_artist_id)
+
+        # check null case
+        void = self.st.artist_id_by_name(None)
+        void_2 = self.st.artist_name_by_id(None)
+        self.assertTrue(void == void_2 and void_2 is None)
+
+        # check invalid input
+        invalid = '_'
+        with self.assertRaises(SpotrendsInputException) as context_name:
+            self.st.artist_id_by_name(invalid)
+        
+        with self.assertRaises(SpotrendsInputException) as context_id:
+            self.st.artist_name_by_id(invalid)
+
+        self.assertFalse('this is broken' in str(context_name.exception))
+        self.assertFalse('this is broken' in str(context_id.exception))
 
 
-    def test_artist_id_by_name(self):
-        pass
+    def test_track_id_name_change(self):
 
-    def test_artist_name_by_id(self):
-        pass
+        # find the id
+        id = self.st.track_id_by_name(self.valid_track_name, self.valid_artist_name)
+        self.assertIsNotNone(id)
 
-    def test_track_id_by_name(self):
-        pass
+        # find the name
+        name = self.st.track_name_by_id(id)
+        self.assertEqual(name, self.valid_track_name)
 
-    def test_album_name_by_id(self):
-        pass
+        # check null case
+        void = self.st.track_id_by_name(None, None)
+        void_2 = self.st.track_name_by_id(None)
+        self.assertTrue(void == void_2 and void_2 is None)
+
+        # check invalid input
+        invalid = '_'
+        with self.assertRaises(SpotrendsInputException) as context_name:
+            self.st.track_id_by_name(invalid, invalid)
+        
+        with self.assertRaises(SpotrendsInputException) as context_id:
+            self.st.track_name_by_id(invalid)
+
+        self.assertFalse('this is broken' in str(context_name.exception))
+        self.assertFalse('this is broken' in str(context_id.exception))
+

@@ -228,8 +228,8 @@ class Spotrend():
                 logging.warning(
                     'features_by_track_id() call with invalid id returns always a None collection')
                 return None
-            data = self._sp.audio_features(tracks=[track_id])
-            data['track_name'] = name
+            data = self._sp.audio_features(tracks=[track_id])[0]
+            data["track_name"] = name
             return data
         except ValueError:
             logging.error('Invalid track id: ' + track_id +
@@ -344,6 +344,7 @@ class Spotrend():
         if album_name is None or album_artist is None:
             logging.warning(
                 'Can\'t retrieve id from album name or album artist with null value. The result is None')
+            return None
         try:
             info = self._sp.search(
                 q=f'album: {album_name} artist: {album_artist}', type="album")
@@ -417,4 +418,4 @@ class Spotrend():
 
 
 sp = Spotrend()
-print(sp.tracks_by_ids(["spotify:track:6rqhFgbbKwnb9MLmUQDhG6"]))
+print(sp.features_by_track_id("6rqhFgbbKwnb9MLmUQDhG6"))
