@@ -1,4 +1,5 @@
 
+from urllib.error import HTTPError
 from dotenv import load_dotenv
 import spotipy
 import logging
@@ -109,39 +110,39 @@ class Spotrend():
         return self.tracks_by_artist_id(artist_id, limit=limit, offset=offset)
 
     def tracks_by_ids(self, tracks_ids: list):
+
         data = {'tracks': []}
+        tracks_ids = list(set(tracks_ids))
         for id in tracks_ids:
             try:
                 data['tracks'].append(self.track_info_by_id(id))
-            except SpotrendsInputException:
-                logging.warning(
-                    'The id ' + id + ' is unreachable or invalid. Please provides a correct one.')
-            finally:
-                return data
+            except HTTPError:
+                raise SpotrendsInputException('Track id: ' + id + ' is invalid.')
+        return data
 
     def artists_by_ids(self, artists_ids: list):
         data = {'artists': []}
+        artists_ids = list(set(artists_ids))
         for id in artists_ids:
             try:
                 data['artists'].append(self.artist_info_by_id(id))
-            except ValueError:
-                logging.warning(
-                    'The id ' + id + ' is unreachable or invalid. Please provides a correct one.')
-            finally:
-                return data
+            except HTTPError:
+                raise SpotrendsInputException('Artist id: ' + id + ' is invalid.')
+        return data
 
     def tracks_by_names(self, tracks_names: list, artist_name: str):
         if artist_name is None or tracks_names is None or len(tracks_names) == 0:
             logging.warning(
                 'Invalid input value return always a void dictionary.')
             return {}
+        tracks_names = list(set(tracks_names))
         return {'tracks': [self.track_info_by_name(track_name=name, artist_name=artist_name) for name in tracks_names]}
 
     def artists_by_names(self, artists_name: list):
         if artists_name is None or len(artists_name) == 0:
             logging.warning(
                 'Invalid input, you must specified a no void list of artists names or the output is None.')
-            return None
+            return {}
         return {'artists': [self.artist_info_by_name(name) for name in artists_name]}
 
     def album_info_by_id(self, album_id: str):
@@ -161,7 +162,7 @@ class Spotrend():
         return self.album_info_by_id(self.album_id_by_name(album_name, artist_name))
 
     def albums_by_artist_id(self, artist_id: str, limit=10, offset=0):
-        if artist_id is None and limit > 50:
+        if artist_id is None:
             logging.warning(
                 'tracks_by_artists_id() call with None artist_id could return void data.')
             return None
@@ -358,6 +359,7 @@ class Spotrend():
         sample = {}
         if type.lower() == 'album':
             sample['spotify_url'] = data['external_urls']['spotify']
+            sample['id'] = data['id']
             sample['name'] = data['name']
             sample['label'] = data['label']
             sample['popularity'] = data['popularity']
@@ -415,4 +417,4 @@ class Spotrend():
 
 
 sp = Spotrend()
-print(sp.track_info_by_id("spotify:track:6rqhFgbbKwnb9MLmUQDhG6")['name'])
+print(sp.tracks_by_ids(["spotify:track:6rqhFgbbKwnb9MLmUQDhG6"]))

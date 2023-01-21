@@ -1,0 +1,1 @@
+coverage run --source=spotrend --module pytest --verbose tests && coverage report --show-missing
