@@ -377,7 +377,9 @@ class Spotrend():
         return features
 
     def artist_id_by_name(self, artist_name: str):
-        """
+        """return the id of the artist given its name in input
+            Parameters:
+                - artist_name : str - the name of the input artist
         """
         if artist_name is None:
             logging.warning(
@@ -391,6 +393,10 @@ class Spotrend():
                 'The artist ' + artist_name + ' doesn\'t exists. Error on the id extraction.')
 
     def artist_name_by_id(self, artist_id: str):
+        """return the name of the artist given its id in input
+            Parameters:
+                - artist_id : str - the id of the input artist
+        """
         if artist_id == None:
             logging.warning(
                 'artist_name_by_id() calls with None artist_id could return void data.')
@@ -406,6 +412,10 @@ class Spotrend():
                 'Invalid artist id: ' + artist_id + '. Try with another one.')
 
     def track_name_by_id(self, track_id: str):
+        """return the name of the track given its id in input
+            Parameters:
+                - track_id : str - the id of the input track
+        """
         if track_id == None:
             logging.warning(
                 'track_name_by_id() call with None artist_id could return void data.')
@@ -421,6 +431,10 @@ class Spotrend():
                 'Invalid track id: ' + track_id + '. Try with another one.')
 
     def track_id_by_name(self, track_name: str, artist_name: str):
+        """return the id of the track given its name and the name of the artist in input
+            Parameters:
+                - track_name : str - the name of the input track
+        """
         if track_name is None or artist_name is None:
             logging.warning(
                 'Can\'t retrieve the track id with artist name or track name with None value.')
@@ -434,6 +448,10 @@ class Spotrend():
                 'The artist ' + artist_name + ' doesn\'t have a track named ' + track_name + '. Error on the id extraction.')
 
     def album_name_by_id(self, album_id: str):
+        """return the name of the album given its id in input
+            Parameters:
+                - album_id : str - the id of the input album
+        """
         if album_id is None:
             logging.warning(
                 'Can\'t retrieve the album with null id, the result is None.')
@@ -449,6 +467,11 @@ class Spotrend():
                 'Invalid artist id: ' + album_id + '. Try with another one.')
 
     def album_id_by_name(self, album_name: str, album_artist: str):
+        """return the id of the album given its name and the artist name, who is owner of the album, in input
+            Parameters:
+                - album_name: str - the name of the input album
+                - album_artist : str - the name of the artist who made the album (the main artist not the featuring)
+        """
         if album_name is None or album_artist is None:
             logging.warning(
                 'Can\'t retrieve id from album name or album artist with null value. The result is None')
@@ -465,6 +488,11 @@ class Spotrend():
                 'Invalid album or artist name. Try with another one.')
 
     def _format(self, type: str, data: dict):
+        """format the output of data according to the data type given in input
+            Parameters:
+                - type : str - the type of the data, it could be album, artist or track
+                - data : dict - the collection of data that need to be formatted
+        """
         sample = {}
         if type.lower() == 'album':
             sample['spotify_url'] = data['external_urls']['spotify']
@@ -524,6 +552,3 @@ class Spotrend():
             raise SpotrendsInputException(
                 'Error type data. Type parameter must be artist, track or album.')
 
-
-sp = Spotrend()
-print(sp.features_by_track_id("6rqhFgbbKwnb9MLmUQDhG6"))
