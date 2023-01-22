@@ -47,7 +47,7 @@ class Spotrend():
         self.limit = 1
 
     def oauth2(self, client_id, client_secret):
-        """ define  the oauth2 credentials for the Spotipy and Spotify API calls
+        """define  the oauth2 credentials for the Spotipy and Spotify API calls
             Parameters:
                 - client_id : str - the id of the client for the oauth2 authorization
                 - client_secret : str - the secret key of the client for the oauth2 authorization
@@ -60,7 +60,7 @@ class Spotrend():
             client_credentials_manager=client_credentials_manager)
 
     def artist_info_by_id(self, artist_id: str):
-        """ return info about the artist with the id specified in input
+        """return info about the artist with the id specified in input
             Parameters:
                 - artist_id : str - the id of the artist
         """
@@ -78,7 +78,7 @@ class Spotrend():
                 'Id ' + artist_id + ' invalid. Try with another value.')
 
     def artist_info_by_name(self, artist_name: str):
-        """ return info about the artist with the name specified in input
+        """return info about the artist with the name specified in input
             Parameters:
                 - artist_name : str - the name of the artist
         """
@@ -89,7 +89,7 @@ class Spotrend():
         return self.artist_info_by_id(self.artist_id_by_name(artist_name))
 
     def track_info_by_id(self, track_id: str):
-        """ return info about the track with the id specified in input
+        """return info about the track with the id specified in input
             Parameters:
                 - track_id : str - the id of the track 
         """
@@ -106,7 +106,7 @@ class Spotrend():
                 'Id ' + track_id + ' invalid. Try with another value.')
 
     def track_info_by_name(self, track_name: str, artist_name: str):
-        """ return info about the track with the name specified in input
+        """return info about the track with the name specified in input
             Parameters:
                 - track_name : str - the name of the track 
         """
@@ -117,7 +117,7 @@ class Spotrend():
         return self.track_info_by_id(self.track_id_by_name(track_name, artist_name))
 
     def tracks_by_artist_id(self, artist_id: str, limit=10, offset=0):
-        """ return a list of tracks info about the tracks of the artist id specified in input
+        """return a list of tracks info about the tracks of the artist id specified in input
             Parameters:
                 - artist_id : str - the id of the main artist of the list of tracks
                 - limit : int - a limit for the cardinality of the output collection, defaault: 10
@@ -141,7 +141,7 @@ class Spotrend():
         return data
 
     def tracks_by_artist_name(self, artist_name: str, limit=10, offset=0):
-        """ return a list of tracks info about the tracks of the artist name specified in input
+        """return a list of tracks info about the tracks of the artist name specified in input
             Parameters:
                 - artist_name : str - the name of the main artist of the list of tracks
                 - limit : int - a limit for the cardinality of the output collection, defaault: 10
@@ -151,7 +151,7 @@ class Spotrend():
         return self.tracks_by_artist_id(artist_id, limit=limit, offset=offset)
 
     def tracks_by_ids(self, tracks_ids: list):
-        """ return a list of tracks info about the id of tracks given in input
+        """return a list of tracks info about the id of tracks given in input
             Parameters:
                 - tracks_ids : list - a collection of id related to the tracks 
         """
@@ -181,7 +181,7 @@ class Spotrend():
         return data
 
     def tracks_by_names(self, tracks_names: list, artist_name: str):
-        """ return a list of tracks info about the name of tracks and the related artist given in input
+        """return a list of tracks info about the name of tracks and the related artist given in input
             Parameters:
                 - tracks_names : list - a collection of names related to the tracks 
                 - artist_name : str - the name of the main artist who made the tracks, so the collection is strictly related to a single artist
@@ -194,7 +194,7 @@ class Spotrend():
         return {'tracks': [self.track_info_by_name(track_name=name, artist_name=artist_name) for name in tracks_names]}
 
     def artists_by_names(self, artists_name: list):
-        """ return a list of artists info about the names of artists given in input
+        """return a list of artists info about the names of artists given in input
             Parameters:
                 - artists_names : list - a collection of names related to the artists
         """
@@ -222,14 +222,14 @@ class Spotrend():
                 'Id ' + album_id + ' invalid. Try with another value.')
 
     def album_info_by_name(self, album_name: str, artist_name: str):
-        """ return info about the album with the name specified in input
+        """return info about the album with the name specified in input
             Parameters:
                 - album_name : str - the name of the album
         """
         return self.album_info_by_id(self.album_id_by_name(album_name, artist_name))
 
     def albums_by_artist_id(self, artist_id: str, limit=10, offset=0):
-        """ return info about the album with the artist id specified in input
+        """return info about the album with the artist id specified in input
             Parameters:
                 - artist_id : str - the id of the artist
                 - limit : int - a limit for the cardinality of the output collection, defaault: 10
@@ -253,7 +253,7 @@ class Spotrend():
         return data
 
     def albums_by_artist_name(self, artist_name: str, limit=10, offset=0):
-        """ return info about the album with the artist name specified in input
+        """return info about the album with the artist name specified in input
             Parameters:
                 - artist_name : str - the name of the artist
                 - limit : int - a limit for the cardinality of the output collection, defaault: 10
@@ -278,12 +278,12 @@ class Spotrend():
                 return data
 
     def available_markets(self):
-        """ return the list of available markets on Spotify
+        """return the list of available markets on Spotify
         """
         return self._sp.available_markets()['markets']
 
     def images_by_artists_id(self, artists_id: list):
-        """ return images info about the collection of artists ids specified in input
+        """return images info about the collection of artists ids specified in input
             Parameters:
                 - artist_id : list - the ids of the artists
         """
@@ -300,7 +300,7 @@ class Spotrend():
         return images
 
     def images_by_artists_names(self, artists_names: list):
-        """ return images info about the collection of artists names specified in input
+        """return images info about the collection of artists names specified in input
             Parameters:
                 - artist_names : list - the names of the artists
         """
@@ -311,6 +311,10 @@ class Spotrend():
         return self.images_by_artists_id([self.artist_id_by_name(name) for name in artists_names])
 
     def features_by_track_id(self, track_id: str):
+        """return features list related to a track id given in input
+            Parameters:
+                - track_id : str - the id of the input track
+        """
         if track_id is None:
             logging.warning(
                 'features_by_track_id() call with null id returns always a None collection')
@@ -331,6 +335,11 @@ class Spotrend():
                 'Invalid track id: ' + track_id + '. Please, try with a valid value.')
 
     def features_by_track_name(self, track_name: str, artist_name: str):
+        """return features list related to a track and artist name given in input
+            Parameters:
+                - track_name : str - the id of the input track
+                - artist_name : str - the id of the input artist
+        """
         if track_name is None or artist_name is None:
             logging.warning(
                 'features_by_track_name() call with null track or artist name returns always a None collection')
@@ -350,6 +359,10 @@ class Spotrend():
                 'Invalid track or artist name. Please, try with a valid value.')
 
     def features_by_tracks_ids(self, tracks_ids: list):
+        """return a list of features collections related to a list of track ids given in input
+            Parameters:
+                - tracks_ids : list - the list of ids of the input tracks
+        """
         if tracks_ids is None or len(tracks_ids) == 0:
             logging.warning(
                 'features_by_tracks_ids() calls with null list returns always None element')
@@ -364,6 +377,8 @@ class Spotrend():
         return features
 
     def artist_id_by_name(self, artist_name: str):
+        """
+        """
         if artist_name is None:
             logging.warning(
                 'Can\'t retrievee the id if the artist name has a None value.')

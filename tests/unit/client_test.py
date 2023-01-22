@@ -15,10 +15,6 @@ _client_secret = os.getenv("spotipy_client_secret")
 
 class Environment():
 
-    """
-    Simulation environment with some id examples
-    """
-
     def __init__(self):
         self.st = Spotrend()  # offset 0 and limit 1
         self.valid_artist_id = "2WX2uTcsvV5OnS0inACecP"
