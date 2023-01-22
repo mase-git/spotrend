@@ -7,10 +7,15 @@
 [![License](https://img.shields.io/badge/License-GNU_3.0-blue)](#license)
 # Spotrend
 
+Spotrend is a Python package that simplifies the process of integrating data from the Spotify API into your projects. With Spotrend, you can easily access and manipulate data such as track information, album details, and artist bios, all without needing to write complex code.
+
 ## Documentation
 ## Installation
+To use Spotrend, you will first need to install the package using pip:
+```
+pip install spotrend
+```
 ## Quick Start
-
 
 ## Acknowledgments
 
