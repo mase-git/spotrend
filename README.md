@@ -15,6 +15,11 @@ To use Spotrend, you will first need to install the package using pip:
 ```
 pip install spotrend
 ```
+To update Spotrend, you will need to use the upgrade flag with pip:
+```
+pip install spotrend --upgrade
+```
+If you have some problem with installation, you can open an issues inside this repository.
 ## Quick Start
 
 ## Acknowledgments
