@@ -2,8 +2,11 @@
   <img width="600px" src="https://user-images.githubusercontent.com/121885783/212549809-136e2c72-aae6-42e8-bfb6-52d714a4c589.png" />
 </div>
 
-[![Language - Python](https://img.shields.io/static/v1?label=Python&message=3.8&color=blue&logo=github)](https://github.com/mase-git/spotrends "Go to GitHub repo")
+[![PyPI pyversions](https://img.shields.io/pypi/pyversions/spotrend.svg)](https://pypi.python.org/pypi/spotrend/)
 [![issues - spotrends](https://img.shields.io/github/issues/spotrend/spotrend)](https://github.com/spotrend/spotrend/issues)
+[![PyPi version](https://badgen.net/pypi/v/spotrend/)](https://pypi.org/project/spotrend)
+[![GitHub release](https://img.shields.io/github/release/spotrend/spotrend.svg)](https://GitHub.com/spotrend/spotrend/releases/)
+[![GitHub forks](https://badgen.net/github/forks/spotrend/spotrend/)](https://GitHub.com/spotrend/spotrend/network/)
 [![License](https://img.shields.io/badge/License-GNU_3.0-blue)](#license)
 # Spotrend
 
