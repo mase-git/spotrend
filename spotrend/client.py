@@ -158,11 +158,7 @@ class Spotrend():
         data = {'tracks': []}
         tracks_ids = list(set(tracks_ids))
         for id in tracks_ids:
-            try:
-                data['tracks'].append(self.track_info_by_id(id))
-            except HTTPError:
-                raise SpotrendsInputException(
-                    'Track id: ' + id + ' is invalid.')
+            data['tracks'].append(self.track_info_by_id(id))
         return data
 
     def artists_by_ids(self, artists_ids: list):
@@ -319,20 +315,11 @@ class Spotrend():
             logging.warning(
                 'features_by_track_id() call with null id returns always a None collection')
             return None
-        try:
-            name = self.track_name_by_id(track_id)
-            if name is None:
-                logging.warning(
-                    'features_by_track_id() call with invalid id returns always a None collection')
-                return None
-            data = self._sp.audio_features(tracks=[track_id])[0]
-            data["track_name"] = name
-            return data
-        except ValueError:
-            logging.error('Invalid track id: ' + track_id +
-                          '. Please, try with a valid value.')
-            raise SpotrendsInputException(
-                'Invalid track id: ' + track_id + '. Please, try with a valid value.')
+        name = self.track_name_by_id(track_id)
+        data = self._sp.audio_features(tracks=[track_id])[0]
+        data["track_name"] = name
+        return data
+
 
     def features_by_track_name(self, track_name: str, artist_name: str):
         """return features list related to a track and artist name given in input
@@ -344,19 +331,10 @@ class Spotrend():
             logging.warning(
                 'features_by_track_name() call with null track or artist name returns always a None collection')
             return None
-        try:
-            track_id = self.track_id_by_name(track_name, artist_name)
-            return self.features_by_track_id(track_id)
-        except ValueError:
-            logging.error(
-                'Invalid track or artist name. Please, try with a valid value.')
-            raise SpotrendsInputException(
-                'Invalid track or artist name. Please, try with a valid value.')
-        except spotipy.exceptions.SpotifyException:
-            logging.error(
-                'Invalid track or artist name. Please, try with a valid value.')
-            raise SpotrendsInputException(
-                'Invalid track or artist name. Please, try with a valid value.')
+
+        track_id = self.track_id_by_name(track_name, artist_name)
+        return self.features_by_track_id(track_id)
+
 
     def features_by_tracks_ids(self, tracks_ids: list):
         """return a list of features collections related to a list of track ids given in input
@@ -369,11 +347,7 @@ class Spotrend():
             return None
         features = {}
         for track_id in tracks_ids:
-            try:
-                features[track_id] = self.features_by_track_id(track_id)
-            except SpotrendsInputException:
-                logging.warning('Invalid data for the current id: ' + track_id)
-                continue
+            features[track_id] = self.features_by_track_id(track_id)
         return features
 
     def artist_id_by_name(self, artist_name: str):
@@ -476,16 +450,12 @@ class Spotrend():
             logging.warning(
                 'Can\'t retrieve id from album name or album artist with null value. The result is None')
             return None
-        try:
-            info = self._sp.search(
+ 
+        info = self._sp.search(
                 q=f'album: {album_name} artist: {album_artist}', type="album")
-            return info['albums']['items'][0]['id']
-        except IndexError:
-            raise SpotrendsInputException(
-                'The album name ' + album_name + ' with author ' + album_artist + ' unreachable')
-        except spotipy.exceptions.SpotifyException:
-            raise SpotrendsInputException(
-                'Invalid album or artist name. Try with another one.')
+        if info == {}:
+            return None
+        return info['albums']['items'][0]['id']
 
     def _format(self, type: str, data: dict):
         """format the output of data according to the data type given in input

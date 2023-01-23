@@ -1,4 +1,5 @@
 import unittest
+from urllib.error import HTTPError
 import spotipy
 import os
 from spotrend.client import Spotrend
@@ -50,6 +51,7 @@ def check_credentials(id: str, secret: str) -> bool:
     st = Spotrend(client_id=id, client_secret=secret)
     return st._client_id == _client_id and st._client_secret == _client_secret
 
+
 def check_list_values(x: list, y: list):
     if len(x) != len(y):
         return False
@@ -92,12 +94,10 @@ class SpotrendsTest(unittest.TestCase):
         is_true = check_credentials(self.st._client_id, self.st._client_secret)
         self.assertTrue(is_true)
 
-
     def test_oauth2(self):
         st = Spotrend()
         st.oauth2(self.st._client_id, self.st._client_secret)
         self.assertTrue(check_credentials(st._client_id, st._client_secret))
-    
 
     def test_artist_info(self):
         with self.assertRaises(SpotrendsInputException) as context_id:
@@ -198,7 +198,7 @@ class SpotrendsTest(unittest.TestCase):
         # void element on None name
         res = self.st.tracks_by_artist_name(None)
         self.assertIsNone(res)
-        
+
         # out limit
         with self.assertRaises(SpotrendsInputException) as context_limit:
             res = self.st.tracks_by_artist_id(self.valid_artist_id, limit=90)
@@ -236,7 +236,8 @@ class SpotrendsTest(unittest.TestCase):
         self.assertFalse('this is broken' in str(context_id.exception))
 
         # do the same for the by names
-        result_name = self.st.tracks_by_names([self.valid_track_name], self.valid_artist_name)
+        result_name = self.st.tracks_by_names(
+            [self.valid_track_name], self.valid_artist_name)
         self.assertIsInstance(result_name, dict)
 
         keys = list(result_name.keys())
@@ -247,14 +248,14 @@ class SpotrendsTest(unittest.TestCase):
 
         artist_name = tracks_names[0]['artist_name']
         track_name = tracks_names[0]['name']
-        self.assertTrue(artist_name == self.valid_artist_name and track_name == self.valid_track_name)
+        self.assertTrue(
+            artist_name == self.valid_artist_name and track_name == self.valid_track_name)
 
         self.assertTrue(check_results(result_name, result_id))
 
         # check void result
         result = self.st.tracks_by_names([], self.valid_artist_name)
         self.assertEqual(result, {})
-
 
     def test_artists_by_values(self):
         # retrieve the correct data
@@ -280,7 +281,7 @@ class SpotrendsTest(unittest.TestCase):
             not_valid = '_'
             self.st.artists_by_ids([not_valid])
         self.assertFalse('this is broken' in str(context_id.exception))
-    
+
         # do the same for the by names
         result_name = self.st.artists_by_names([self.valid_artist_name])
         self.assertIsInstance(result_name, dict)
@@ -303,7 +304,6 @@ class SpotrendsTest(unittest.TestCase):
     def test_tracks_by_names(self):
         void = self.st.tracks_by_names([], self.valid_artist_name)
         self.assertDictEqual(void, {})
-
 
         result = self.st.tracks_by_names(
             [self.valid_track_name], self.valid_artist_name)
@@ -331,13 +331,13 @@ class SpotrendsTest(unittest.TestCase):
         with self.assertRaises(SpotrendsInputException) as context_id:
             not_valid = '_'
             self.st.album_info_by_id(not_valid)
-        
+
         self.assertFalse('this is broken' in str(context_id.exception))
 
         result = self.st.album_info_by_id(self.valid_album_id)
         self.assertIsInstance(result, dict)
 
-        # check id 
+        # check id
         id = result['id']
         self.assertEqual(id, self.valid_album_id)
 
@@ -345,13 +345,13 @@ class SpotrendsTest(unittest.TestCase):
         self.assertIsNone(void)
 
         # do the same controls for the name input
-        result = self.st.album_info_by_name(self.valid_album_name, self.valid_artist_name)
+        result = self.st.album_info_by_name(
+            self.valid_album_name, self.valid_artist_name)
         self.assertIsInstance(result, dict)
 
         # check album name
         name = result['name']
         self.assertEqual(name, self.valid_album_name)
-
 
     def test_albums_by_artist(self):
 
@@ -361,18 +361,19 @@ class SpotrendsTest(unittest.TestCase):
 
         result_id = self.st.albums_by_artist_id(self.valid_artist_id)
         self.assertIsInstance(result_id, dict)
-    
+
         # check structure
         albums = result_id['albums']
         self.assertIsNotNone(albums)
-        
+
         # check collection
         self.assertIsInstance(albums, list)
 
         # check validity
         self.assertTrue(len(albums) != 0)
 
-        result_name = self.st.albums_by_artist_name(self.st.artist_name_by_id(self.valid_artist_id))
+        result_name = self.st.albums_by_artist_name(
+            self.st.artist_name_by_id(self.valid_artist_id))
 
         albums = result_name['albums']
         self.assertIsNotNone(albums)
@@ -388,16 +389,16 @@ class SpotrendsTest(unittest.TestCase):
 
         # check limit
         with self.assertRaises(SpotrendsInputException) as context_limit:
-            self.st.albums_by_artist_id(self.valid_artist_id, limit=70) # valid until 50
-    
+            self.st.albums_by_artist_id(
+                self.valid_artist_id, limit=70)  # valid until 50
+
         self.assertFalse('this is broken' in str(context_limit.exception))
-    
+
         # check equality
         albums_id = result_id['albums']
         album_name = result_name['albums']
         res = check_list_values(albums_id, album_name)
         self.assertTrue(res)
-
 
     def test_albums_by_ids(self):
         res = self.st.albums_by_ids([self.valid_album_id])
@@ -414,6 +415,9 @@ class SpotrendsTest(unittest.TestCase):
         # check id reference
         sample = albums[0]
         self.assertEqual(sample['id'], self.valid_album_id)
+
+        error = self.st.albums_by_ids(['_'])
+        self.assertEqual(len(error['albums']), 0)
 
     def test_available_markets(self):
         res = self.st.available_markets()
@@ -436,7 +440,7 @@ class SpotrendsTest(unittest.TestCase):
         # check keys
         keys = list(res_id.keys())
         self.assertListEqual(keys, ['images'])
-    
+
         keys_2 = list(res_name.keys())
         self.assertListEqual(keys, keys_2)
 
@@ -446,10 +450,18 @@ class SpotrendsTest(unittest.TestCase):
 
         # check same cardinality
         self.assertTrue(len(images) == len(images_2))
-    
+
+        # check None artist by id
+        res = self.st.images_by_artists_id(None)
+        self.assertIsNone(res)
+
+        # check the same for the name version
+        res = self.st.images_by_artists_names(None)
+        self.assertIsNone(res)
 
     def test_features_by_track(self):
-        id = self.st.track_id_by_name(self.valid_track_name, self.valid_artist_name)
+        id = self.st.track_id_by_name(
+            self.valid_track_name, self.valid_artist_name)
 
         # check void
         void = self.st.features_by_track_id(None)
@@ -457,14 +469,36 @@ class SpotrendsTest(unittest.TestCase):
         self.assertTrue(void == void_2 and void_2 == None)
 
         # retrieve info
-        feat_name = self.st.features_by_track_name(self.valid_track_name, self.valid_artist_name)
+        feat_name = self.st.features_by_track_name(
+            self.valid_track_name, self.valid_artist_name)
         feat_id = self.st.features_by_track_id(id)
 
         # check structure
         res = check_results(feat_name, feat_id)
         self.assertTrue(res)
 
+        # catching exception
+        with self.assertRaises(SpotrendsInputException) as context_id:
+            self.st.features_by_track_id('_')
 
+        with self.assertRaises(SpotrendsInputException) as context_name:
+            self.st.features_by_track_name('_', '_')
+
+        self.assertTrue('this is broken', context_id)
+        self.assertTrue('this is broken', context_name)
+
+    def test_features_by_tracks_ids(self):
+        id = self.st.track_id_by_name(
+            self.valid_track_name, self.valid_artist_name)
+        void = self.st.features_by_tracks_ids(None)
+        self.assertIsNone(void)
+
+        feats_id = self.st.features_by_tracks_ids([id])
+        self.assertIsInstance(feats_id, dict)
+
+        keys = list(feats_id.keys())
+        self.assertListEqual(keys, [id])
+    
 
     def test_artist_id_name_change(self):
         # find the name
@@ -484,7 +518,7 @@ class SpotrendsTest(unittest.TestCase):
         invalid = '_'
         with self.assertRaises(SpotrendsInputException) as context_name:
             self.st.artist_id_by_name(invalid)
-        
+
         with self.assertRaises(SpotrendsInputException) as context_id:
             self.st.artist_name_by_id(invalid)
 
@@ -493,9 +527,9 @@ class SpotrendsTest(unittest.TestCase):
 
 
     def test_track_id_name_change(self):
-
         # find the id
-        id = self.st.track_id_by_name(self.valid_track_name, self.valid_artist_name)
+        id = self.st.track_id_by_name(
+            self.valid_track_name, self.valid_artist_name)
         self.assertIsNotNone(id)
 
         # find the name
@@ -511,10 +545,43 @@ class SpotrendsTest(unittest.TestCase):
         invalid = '_'
         with self.assertRaises(SpotrendsInputException) as context_name:
             self.st.track_id_by_name(invalid, invalid)
-        
+
         with self.assertRaises(SpotrendsInputException) as context_id:
             self.st.track_name_by_id(invalid)
 
         self.assertFalse('this is broken' in str(context_name.exception))
         self.assertFalse('this is broken' in str(context_id.exception))
+
+    
+    def test_album_id_name_change(self):
+        # find the id
+        id = self.st.album_id_by_name(
+            self.valid_album_name, self.valid_artist_name)
+        self.assertIsNotNone(id)
+
+        # find the name
+        name = self.st.album_name_by_id(id)
+        self.assertEqual(name, self.valid_album_name)
+
+        # check null case
+        void = self.st.album_id_by_name(None, None)
+        void_2 = self.st.album_name_by_id(None)
+        self.assertTrue(void == void_2 and void_2 is None)
+
+        # check invalid input
+        invalid = '_'
+
+        with self.assertRaises(SpotrendsInputException) as context_id:
+            self.st.album_name_by_id(invalid)
+
+        self.assertFalse('this is broken' in str(context_id.exception))
+
+    def test_format(self):
+        # we need to test only the error case
+        with self.assertRaises(SpotrendsInputException) as context:
+            self.st._format(type='_', data={})
+        
+        self.assertFalse('this is broken' in str(context.exception))
+
+
 
