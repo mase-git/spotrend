@@ -1,4 +1,5 @@
-class SpotifyAPIAuthError(Exception):
+
+class SpotrendAuthError(Exception):
     """
     This exception would be raised when there is an issue 
     with authenticating with the Spotify API, 
@@ -7,7 +8,7 @@ class SpotifyAPIAuthError(Exception):
     pass
 
 
-class SpotifyAPIRequestError(Exception):
+class SpotrendRequestError(Exception):
     """
     This exception would be raised when there is an issue 
     with making a request to the Spotify API, such as a network 
@@ -16,7 +17,7 @@ class SpotifyAPIRequestError(Exception):
     pass
 
 
-class SpotifyAPIPermissionError(Exception):
+class SpotrendPermissionError(Exception):
     """
     This exception would be raised when the user does not 
     have sufficient permissions to perform the requested action, 
@@ -25,7 +26,7 @@ class SpotifyAPIPermissionError(Exception):
     pass
 
 
-class SpotifyAPINotFoundError(Exception):
+class SpotrendNotFoundError(Exception):
     """
     This exception would be raised when the requested 
     resource is not found, such as a track or album that does not exist.
@@ -33,7 +34,7 @@ class SpotifyAPINotFoundError(Exception):
     pass
 
 
-class SpotifyAPIInvalidDataError(Exception):
+class SpotrendInvalidDataError(Exception):
     """
     This exception would be raised when the data passed 
     to the API is invalid, such as an invalid track URI or playlist name.
@@ -41,15 +42,26 @@ class SpotifyAPIInvalidDataError(Exception):
     pass
 
 
-class SpotifyAPIQuotaError(Exception):
+class SpotrendQuotaError(Exception):
     """
     This exception would be raised when the user has reached their rate limit for the day.
     """
     pass
 
 
-class SpotifyAPIServerError(Exception):
+class SpotrendServerError(Exception):
     """
     This exception would be raised when there is an issue on Spotify server side.
     """
     pass
+
+
+__all__ = [
+    SpotrendAuthError,
+    SpotrendRequestError,
+    SpotrendPermissionError,
+    SpotrendInvalidDataError,
+    SpotrendServerError,
+    SpotrendQuotaError,
+    SpotrendNotFoundError,
+]
