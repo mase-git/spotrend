@@ -29,7 +29,7 @@ class Loader(Client):
         The resource type specified the type of the item to request.
 
         Parameters:
-            lookup_id (str): The Spotify ID of the resource
+            lookup_id (str): The Spotify ID, URI or URL of the resource
             resource_type (str): The type of the resource, it can be artists, shows, episodes, audiobooks, 
                                  chapters, tracks, users, playlists.
             version (str): The current version of the resource. Default value is v1.
@@ -46,7 +46,7 @@ class Loader(Client):
         Notes:
         This function is used to retrieves the main data from the Spotify API. The current resource types
         available are listed in the parameters section, any other specified resource types are not available for this
-        function, check the documentatio for more info.
+        function, check the documentation for more info.
 
         """
         version = version | self.version
@@ -58,14 +58,6 @@ class Loader(Client):
     def _status(status_code):
         if status_code in range(200, 299):
             pass
-        elif status_code in range(500, 599):
-            raise spotrend.exceptions.SpotrendServerError(
-                "Internal server error")
-        elif status_code == 401:
-            raise spotrend.exceptions.SpotrendPermissionError(
-                "Invalid user client credentials")
-        elif status_code == 404:
-            raise spotrend.exceptions.SpotrendNotFoundError("Page not found")
         else:
             raise spotrend.exceptions.SpotrendRequestError(
                 f"Invalid request with {status_code} status code.")
