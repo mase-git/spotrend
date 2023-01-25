@@ -11,7 +11,8 @@ def authenticate(func):
     def wrapper(*args, **kwargs):
         spotify = args[0]
         if not spotify.authenticate():
-            raise spotrend.exceptions.SpotrendAuthError("Invalid user client credentials")
+            raise spotrend.exceptions.SpotrendAuthError(
+                "Invalid user client credentials")
         return func(*args, **kwargs)
     return wrapper
 
@@ -22,22 +23,60 @@ class Loader(Client):
         super(self, Client(client_id, client_secret))
 
     @authenticate
-    def get_resource(self, lookup_id, resource_type, version="v1"):
+    def get_resource(self, lookup_id: str, resource_type: str, version="v1") -> json:
+        """
+        Invocation of a GET function to retrieves resources using Spotify API.
+        The resource type specified the type of the item to request.
+
+        Parameters:
+            lookup_id (str): The Spotify ID of the resource
+            resource_type (str): The type of the resource, it can be artists, shows, episodes, audiobooks, 
+                                 chapters, tracks, users, playlists.
+            version (str): The current version of the resource. Default value is v1.
+
+        Returns:
+            json: The raw data in a json format
+
+        Raises:
+            SpotrendServerError: If the server endpoint is currently unreachable or there is internal error.
+            SpotrendPermissionError: If the request has invalid credentials 
+            SpotrendNotFound: If the requested resource doesn't exist
+            SpotrendRequestError: For any other error type, with a specified status code
+
+        Notes:
+        This function is used to retrieves the main data from the Spotify API. The current resource types
+        available are listed in the parameters section, any other specified resource types are not available for this
+        function, check the documentatio for more info.
+
+        """
+        version = version | self.version
         endpoint = f"https://api.spotify.com/{version}/{resource_type}/{lookup_id}"
         headers = self.get_resource_header()
-        r = requests.get(endpoint, headers=headers)
-        Loader.get_status(r.status_code)
-        return json.loads(r.text)
+        return self._get(endpoint, headers)
 
     @staticmethod
-    def get_status(status_code):
+    def _status(status_code):
         if status_code in range(200, 299):
             pass
         elif status_code in range(500, 599):
-            raise spotrend.exceptions.SpotrendServerError("Internal server error")
+            raise spotrend.exceptions.SpotrendServerError(
+                "Internal server error")
         elif status_code == 401:
-            raise spotrend.exceptions.SpotrendPermissionError("Invalid user client credentials")
+            raise spotrend.exceptions.SpotrendPermissionError(
+                "Invalid user client credentials")
         elif status_code == 404:
             raise spotrend.exceptions.SpotrendNotFoundError("Page not found")
         else:
-            raise spotrend.exceptions.SpotrendRequestError(f"Invalid request with {status_code} status code.")
+            raise spotrend.exceptions.SpotrendRequestError(
+                f"Invalid request with {status_code} status code.")
+
+    def _get(self, endpoint, headers):
+        r = requests.get(endpoint, headers=headers)
+        Loader._status(r.status_code)
+        return json.loads(r.text)
+
+
+    def _post(self, endpoint, headers, data):
+        r = requests.post(endpoint, headers, data)
+        Loader._status(r.status_code)
+        return json.loads(r.text)

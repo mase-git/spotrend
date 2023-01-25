@@ -1,6 +1,7 @@
 
 from dotenv import load_dotenv
 import spotrend.exceptions
+import loader
 import logging
 import requests
 import base64
@@ -64,10 +65,7 @@ class Client():
         token_url = self.access_token_url
         token_data = self.get_token_data()
         token_headers = self.get_token_headers()
-        r = requests.post(token_url, data=token_data, headers=token_headers)
-        if r.status_code not in range(200, 299):
-            return False
-        data = json.loads(r.text)
+        data = loader.Loader._post(token_url, data=token_data, headers=token_headers)
         now = datetime.datetime.now()
         access_token = data['access_token']
         expires_in = data['expires_in']  # Spotify provides it in seconds
