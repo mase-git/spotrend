@@ -1,7 +1,3 @@
-<div align="center">
-  <img width="600px" src="https://user-images.githubusercontent.com/121885783/212549809-136e2c72-aae6-42e8-bfb6-52d714a4c589.png" />
-</div>
-
 [![PyPI pyversions](https://img.shields.io/pypi/pyversions/spotrend.svg)](https://pypi.python.org/pypi/spotrend/)
 [![issues - spotrends](https://img.shields.io/github/issues/spotrend/spotrend)](https://github.com/spotrend/spotrend/issues)
 [![PyPi version](https://badgen.net/pypi/v/spotrend/)](https://pypi.org/project/spotrend)
