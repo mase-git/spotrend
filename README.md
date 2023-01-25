@@ -1,4 +1,3 @@
-[![PyPI pyversions](https://img.shields.io/pypi/pyversions/spotrend.svg)](https://pypi.python.org/pypi/spotrend/)
 [![issues - spotrends](https://img.shields.io/github/issues/spotrend/spotrend)](https://github.com/spotrend/spotrend/issues)
 [![GitHub forks](https://badgen.net/github/forks/spotrend/spotrend/)](https://GitHub.com/spotrend/spotrend/network/)
 [![License](https://img.shields.io/badge/License-GNU_3.0-blue)](#license)
