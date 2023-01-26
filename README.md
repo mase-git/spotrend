@@ -20,12 +20,7 @@ If you have some problem with installation, you can open an issues inside this r
 
 ## Acknowledgments
 
-We would like to thank the following open-source projects for their contributions to this project:
-
-- [Spotify API](https://developer.spotify.com/documentation/web-api/)
-- [Spotipy](https://github.com/spotipy-dev/spotipy)
-
-We would also like to thank Spotify for providing access to their API and for their support throughout the development of related projects. 
+We would like to thank Spotify for providing access to their API and for their support throughout the development of related projects. 
 
 ## License
 
