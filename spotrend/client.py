@@ -17,7 +17,26 @@ logging.basicConfig(
 
 _client_id = os.getenv("SPOTREND_CLIENT_ID")
 _client_secret = os.getenv("SPOTREND_CLIENT_SECRET")
+items = [
+    "albums",
+    "artists",
+    "shows",
+    "episodes",
+    "audiobooks",
+    "chapters",
+    "tracks",
+    "playlists",
+]
 
+def authenticate(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        loader = args[0]
+        if not loader.client_id or not loader.client_secret:
+            raise SpotrendAuthError(
+                "Invalid user client credentials")
+        return func(*args, **kwargs)
+    return wrapper
 
 
 class Client():
@@ -116,30 +135,6 @@ class Client():
             "Content-Type": "application/json"
         }
         return headers
-
-
-items = [
-    "albums",
-    "artists",
-    "shows",
-    "episodes",
-    "audiobooks",
-    "chapters",
-    "tracks",
-    "playlists",
-]
-
-
-def authenticate(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        loader = args[0]
-        if not loader.client_id or not loader.client_secret:
-            raise SpotrendAuthError(
-                "Invalid user client credentials")
-        return func(*args, **kwargs)
-    return wrapper
-
 
 class Loader(Client):
 
