@@ -1,5 +1,6 @@
 from spotrend.client import *
 from spotrend.pattern import *
+import re
 
 load_dotenv()
 
@@ -24,20 +25,40 @@ class Spotrend(Loader, metaclass=Singleton):
         return self.get_available_resource("recommendations", "available-genre-seeds", version=version)
 
     @authenticate
-    def get_artist(self, artist_id : str, version="v1") -> dict:
+    def get_artist(self, artist_id: str, version="v1") -> dict:
         return self.get_resource(artist_id, "artists", version=version)
-    
+
     @authenticate
-    def get_track(self, track_id : str, market=None, version="v1") -> dict:
+    def get_track(self, track_id: str, market=None, version="v1") -> dict:
         query = {}
         if market != None:
-            query = { "market" : market }
+            query = {"market": market}
         return self.get_resource(track_id, "tracks", queries=query, version=version)
 
     @authenticate
-    def get_album(self, album_id : str, market=None, version="v1") -> dict:
+    def get_album(self, album_id: str, market=None, version="v1") -> dict:
         query = {}
         if market != None:
-            query = { "market" : market }
+            query = {"market": market}
         return self.get_resource(album_id, "albums", queries=query, version=version)
-    
+
+    def get_episode(self, episode_id, market=None, version="v1") -> dict:
+        query = {}
+        if market != None:
+            query = {"market": market}
+        return self.get_resource(episode_id, "episodes", queries=query, version=version)
+
+    def get_playlist(self, playlist_id, additional_type=None, fields=None, market=None, version="v1") -> dict:
+        query = {}
+        if additional_type != None and additional_type.lower() in ("track", "episode"):
+            query["additional_type"] = additional_type.lower()
+        if fields != None and self._field_regex(fields):
+            query['fields'] = fields.lower()
+        if market != None:
+            query['market'] = market
+        return self.get_resource(playlist_id, "playlists", queries=query, version=version)
+
+    def _field_regex(self, fields : str) -> bool:
+        # limited control caused by pumping-lemma
+        pattern = re.compile(r"(\w+\.)?\w+\(\w+(\,\w+)*\)") 
+        return bool(pattern.match(fields))

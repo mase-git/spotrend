@@ -27,6 +27,9 @@ items = [
     "tracks",
     "playlists",
 ]
+scopes = {
+    # TODO: define the scope for the episodes or other methods with different scope from default one.
+}
 
 def authenticate(func):
     @wraps(func)
@@ -186,6 +189,8 @@ class Loader(Client):
 
     @staticmethod
     def _get(endpoint, headers):
+        print(endpoint)
+        print(headers)
         r = requests.get(url=endpoint, headers=headers)
         Loader._status(r)
         return json.loads(r.text)

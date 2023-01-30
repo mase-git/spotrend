@@ -54,7 +54,57 @@ class SpotrendTest(unittest.TestCase):
 
         # define again if the status code is 2xx
         self.assertTrue(correct_status(track))
-        
+    
+    def test_get_playlist(self):
+        playlist_id = "3cEYpjA9oz9GiPac4AsH4n"
+        playlist = self.st.get_playlist(playlist_id)
+        self.assertIsInstance(playlist, dict)
+
+        # test response status
+        self.assertTrue(correct_status(playlist))
+
+        # call API with specific market
+        market = "US"
+        playlist = self.st.get_playlist(playlist_id, market=market)
+        self.assertIsInstance(playlist, dict)
+
+        # define again the correct 2xx status code
+        self.assertTrue(correct_status(playlist))
+
+        # adding also the fields query
+        fields = "items(added_by.id,track(name,href,album(name,href)))"
+        playlist = self.st.get_playlist(playlist_id, fields=fields, market=market)
+        self.assertIsInstance(playlist, dict)
+
+        # define again the correct 2xx status code
+        self.assertTrue(correct_status(playlist))
+
+
+        # finally, adding the additional_types
+        additional_type="track" # playlist of track
+
+        playlist = self.st.get_playlist(playlist_id, additional_type=additional_type, fields=fields, market=market)
+        self.assertIsInstance(playlist, dict)
+
+        # define again the correct 2xx status code
+        self.assertTrue(correct_status(playlist))
+
+    def test_get_episode(self):
+        episode_id = "512ojhOuo1ktJprKbVcKyQ"
+        episode = self.st.get_episode(episode_id)
+        self.assertIsInstance(episode, dict)
+
+        # test response status
+        self.assertTrue(correct_status(episode))
+
+        # call API with specific market
+        market = "US"
+        episode = self.st.get_track(episode_id, market=market)
+        self.assertIsInstance(episode, dict)
+
+        # define again if the status code is 2xx
+        self.assertTrue(correct_status(episode))
+
 
     def test_available_markets(self):
         markets = self.st.get_available_markets()
