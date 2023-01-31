@@ -10,7 +10,6 @@ _client_secret = os.getenv("SPOTREND_CLIENT_SECRET")
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s: %(message)s')
 
-
 class Spotrend(Loader, metaclass=Singleton):
 
     def __init__(self, client_id=_client_id, client_secret=_client_secret):

@@ -15,9 +15,13 @@ load_dotenv()
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s: %(message)s')
 
+# environnment variables
 _client_id = os.getenv("SPOTREND_CLIENT_ID")
 _client_secret = os.getenv("SPOTREND_CLIENT_SECRET")
-items = [
+_redirect_uri = os.getenv("SPOTREND_REDIRECT_URI")
+
+# Spotify items 
+_items = (
     "albums",
     "artists",
     "shows",
@@ -26,10 +30,30 @@ items = [
     "chapters",
     "tracks",
     "playlists",
-]
-scopes = {
-    # TODO: define the scope for the episodes or other methods with different scope from default one.
-}
+)
+
+_scopes = (
+    "ugc-image-upload",
+    "user-read-playback-state",
+    "user-modify-playback-state",
+    "user-read-currently-playing",
+    "app-remote-control",
+    "streaming",
+    "playlist-read-private",
+    "playlist-read-collaborative",
+    "playlist-modify-private",
+    "playlist-modify-public",
+    "user-follow-modify",
+    "user-follow-read",
+    "user-read-playback-position",
+    "user-top-read",
+    "user-read-recently-played",
+    "user-library-modify",
+    "user-library-read",
+    "user-read-email",
+    "user-read-private",
+)
+
 
 def authenticate(func):
     @wraps(func)
@@ -50,9 +74,17 @@ class Client():
         self.access_token = None
         self.access_token_expires = None
         self.access_token_did_expire = True
+        self.scope = "default"
         self.version = "v1"
         self.access_token_url = "https://accounts.spotify.com/api/token"
         self.headers = None
+
+    def set_scope(self, scope):
+        if scope not in _scopes:
+            raise SpotrendAuthError('Invalid scope')
+        if self.scope != scope:
+            self.scope = scope
+        # TODO: Update the current scope and guarantee the correct oauth2 token
 
     def get_client_credentials(self):
         """
@@ -147,10 +179,12 @@ class Loader(Client):
         self.client_secret = client_secret
 
     @authenticate
-    def get_resource(self, lookup_id: str, type: str,  queries={}, version="v1") -> dict:
+    def get_resource(self, lookup_id: str, type: str,  queries={}, scope="default", version="v1") -> dict:
         endpoint = f"https://api.spotify.com/{version}/{type}/{lookup_id}?"
-        if type not in items or lookup_id == None:
+        if type not in _items or lookup_id == None:
             raise SpotrendInvalidDataError('The type of data is invalid.')
+        # change the authentication scope
+        self.set_scope(scope)
         for name, value in queries.items():
             endpoint = f"{endpoint}&{name}={value}"
         headers = self.get_resource_header()
@@ -159,10 +193,12 @@ class Loader(Client):
         return Loader._get(endpoint, headers)
 
     @authenticate
-    def get_several_resources(self, lookup_ids: list[str], type: str, queries={}, version="v1") -> dict:
-        if len(lookup_ids) == 0 or type not in items:
+    def get_several_resources(self, lookup_ids: list[str], type: str, queries={}, scope="default", version="v1") -> dict:
+        if len(lookup_ids) == 0 or type not in _items:
             raise SpotrendInvalidDataError(
                 'You need to specify a spotify ID, URI or URL.')
+        # change authentication scope
+        self.set_scope(scope)
         first = lookup_ids.pop(0)
         endpoint = f"https://api.spotify.com/{version}/{type}?ids={first}"
         for lookup_id in lookup_ids:
