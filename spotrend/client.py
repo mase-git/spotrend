@@ -8,69 +8,37 @@ import requests
 import json
 import os
 
-from spotrend.exceptions import SpotrendAuthError, SpotrendInvalidDataError, SpotrendRequestError
-
-load_dotenv()
+from spotrend.type import *
+from spotrend.exceptions import *
 
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s: %(message)s')
 
-# environnment variables
-_client_id = os.getenv("SPOTREND_CLIENT_ID")
-_client_secret = os.getenv("SPOTREND_CLIENT_SECRET")
-_redirect_uri = os.getenv("SPOTREND_REDIRECT_URI")
-
-# Spotify items 
-_items = (
-    "albums",
-    "artists",
-    "shows",
-    "episodes",
-    "audiobooks",
-    "chapters",
-    "tracks",
-    "playlists",
-)
-
-_scopes = (
-    "ugc-image-upload",
-    "user-read-playback-state",
-    "user-modify-playback-state",
-    "user-read-currently-playing",
-    "app-remote-control",
-    "streaming",
-    "playlist-read-private",
-    "playlist-read-collaborative",
-    "playlist-modify-private",
-    "playlist-modify-public",
-    "user-follow-modify",
-    "user-follow-read",
-    "user-read-playback-position",
-    "user-top-read",
-    "user-read-recently-played",
-    "user-library-modify",
-    "user-library-read",
-    "user-read-email",
-    "user-read-private",
-)
-
-
 def authenticate(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
-        loader = args[0]
-        if not loader.client_id or not loader.client_secret:
+        instance = args[0]
+        if not instance.id or not instance.secret:
             raise SpotrendAuthError(
                 "Invalid user client credentials")
         return func(*args, **kwargs)
     return wrapper
 
-
 class Client():
 
-    def __init__(self, client_id=_client_id, client_secret=_client_secret):
-        self.client_id = client_id
-        self.client_secret = client_secret
+    def __init__(self, id=None, secret=None, redirect_uri=None):
+        load_dotenv()
+        self.id = id or os.getenv("SPOTREND_CLIENT_ID")
+        self.secret = secret or os.getenv("SPOTREND_CLIENT_SECRET")
+        self.redirect_uri = redirect_uri or os.getenv("SPOTREND_REDIRECT_URI")
+
+class AuthClient(Client):
+    pass
+
+class CredentialsClient(Client):
+
+    def __init__(self, id=None, secret=None):
+        super().__init__(id, secret)
         self.access_token = None
         self.access_token_expires = None
         self.access_token_did_expire = True
@@ -79,23 +47,14 @@ class Client():
         self.access_token_url = "https://accounts.spotify.com/api/token"
         self.headers = None
 
-    def set_scope(self, scope):
-        if scope not in _scopes:
-            raise SpotrendAuthError('Invalid scope')
-        if self.scope != scope:
-            self.scope = scope
-        # TODO: Update the current scope and guarantee the correct oauth2 token
-
+    @authenticate
     def get_client_credentials(self):
         """
         Returns a base64 encoded string
         """
-        client_id = self.client_id
-        client_secret = self.client_secret
-        if client_secret == None or client_id == None:
-            raise SpotrendAuthError(
-                "You must set client_id and client_secret")
-        client_creds = f"{client_id}:{client_secret}"
+        id = self.id
+        secret = self.secret
+        client_creds = f"{id}:{secret}"
         client_creds_b64 = base64.b64encode(client_creds.encode())
         return client_creds_b64.decode()
 
@@ -170,75 +129,3 @@ class Client():
             "Content-Type": "application/json"
         }
         return headers
-
-class Loader(Client):
-
-    def __init__(self, client_id=_client_id, client_secret=_client_secret):
-        super().__init__(client_id, client_secret)
-        self.client_id = client_id
-        self.client_secret = client_secret
-
-    @authenticate
-    def get_resource(self, lookup_id: str, type: str,  queries={}, scope="default", version="v1") -> dict:
-        endpoint = f"https://api.spotify.com/{version}/{type}/{lookup_id}?"
-        if type not in _items or lookup_id == None:
-            raise SpotrendInvalidDataError('The type of data is invalid.')
-        # change the authentication scope
-        self.set_scope(scope)
-        for name, value in queries.items():
-            endpoint = f"{endpoint}&{name}={value}"
-        headers = self.get_resource_header()
-        if endpoint[-1] == '?':
-            endpoint = endpoint[:-1]
-        return Loader._get(endpoint, headers)
-
-    @authenticate
-    def get_several_resources(self, lookup_ids: list[str], type: str, queries={}, scope="default", version="v1") -> dict:
-        if len(lookup_ids) == 0 or type not in _items:
-            raise SpotrendInvalidDataError(
-                'You need to specify a spotify ID, URI or URL.')
-        # change authentication scope
-        self.set_scope(scope)
-        first = lookup_ids.pop(0)
-        endpoint = f"https://api.spotify.com/{version}/{type}?ids={first}"
-        for lookup_id in lookup_ids:
-            endpoint += f",{lookup_id}"
-        for name, value in queries.items():
-            endpoint = f"{endpoint}&{name}={value}"
-        headers = self.get_resource_header()
-        return Loader._get(endpoint, headers)
-
-    @authenticate
-    def get_available_resource(self, type: str, subpath="", version="v1") -> dict:
-        endpoint = f"https://api.spotify.com/{version}/{type}/{subpath}"
-        headers = self.get_resource_header()
-        return Loader._get(endpoint, headers)
-
-    @staticmethod
-    def _status(response: dict):
-        if response.status_code in range(200, 299):
-            pass
-        else:
-            res = json.loads(response.text)
-            message = f"Error {res['error']['status']} - {res['error']['message']}"
-            raise SpotrendRequestError(message)
-
-    @staticmethod
-    def _get(endpoint, headers):
-        print(endpoint)
-        print(headers)
-        r = requests.get(url=endpoint, headers=headers)
-        Loader._status(r)
-        return json.loads(r.text)
-
-    @staticmethod
-    def _post(endpoint, headers, data):
-        r = requests.post(url=endpoint, headers=headers, data=data)
-        Loader._status(r)
-        return json.loads(r.text)
-
-    @staticmethod
-    def _put(endpoint, headers, data):
-        r = requests.put(url=endpoint, headers=headers, data=data)
-        Loader._status(r)
-        return json.loads(r.text)

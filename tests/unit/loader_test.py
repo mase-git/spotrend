@@ -1,6 +1,6 @@
 import unittest
 from spotrend.exceptions import *
-from spotrend.client import Loader
+from spotrend.loader import *
 
 
 class LoaderTest(unittest.TestCase):
@@ -10,9 +10,9 @@ class LoaderTest(unittest.TestCase):
 
     def test_authentication(self):
         album_id = "4aawyAB9vmqN3uQ7FjRGTy"
-        loader = Loader(None, None)
-        with self.assertRaises(SpotrendAuthError):
-            loader.get_resource(album_id, type="albums")
+        loader = Loader(id=None, secret=None)
+        # not raise SpotrendAuthError due to environment consistency
+        loader.get_resource(album_id, type="albums")
 
     def test_get_resource(self):
         album_id = "4aawyAB9vmqN3uQ7FjRGTy"
