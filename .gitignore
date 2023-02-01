@@ -361,4 +361,7 @@ poetry.toml
 pyvenv.cfg
 pip-selfcheck.json
 
+# ignore personal token file
+token.json
+
 # End of https://www.toptal.com/developers/gitignore/api/macos,jupyternotebooks,python,circuitpython,pythonvanilla,venv,django

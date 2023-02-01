@@ -1,0 +1,1 @@
+# define a script to inizialize the client credentials according to the authorization flow of the Spotify API

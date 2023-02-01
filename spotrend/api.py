@@ -6,11 +6,10 @@ import re
 logging.basicConfig(
     format='%(asctime)s - %(levelname)s: %(message)s')
 
-
 class Spotrend(metaclass=Singleton):
 
-    def __init__(self, id=None, secret=None, redirect_uri=None):
-        self.client = Client(id, secret, redirect_uri)
+    def __init__(self, client_id : str = None, client_secret : str = None, redirect_uri : str = None, client : Client = None):
+        self.client = client or Client(client_id, client_secret, redirect_uri)
         self.version = "v1"
 
     def get_available_markets(self) -> dict:
@@ -39,7 +38,7 @@ class Spotrend(metaclass=Singleton):
         """
         return self.get_resource(artist_id, "artists")
 
-    def get_track(self, track_id: str, market=None) -> dict:
+    def get_track(self, track_id: str, market : str = None) -> dict:
         """
         Return an object with track information
         - Parameters:
@@ -57,7 +56,7 @@ class Spotrend(metaclass=Singleton):
             query['market'] = market
         return self.get_resource(track_id, "tracks", queries=query)
 
-    def get_album(self, album_id: str, market=None) -> dict:
+    def get_album(self, album_id: str, market : str = None) -> dict:
         """
         Return an object with album information
         - Parameters:
@@ -75,7 +74,7 @@ class Spotrend(metaclass=Singleton):
             query['market'] = market
         return self.get_resource(album_id, "albums", queries=query)
 
-    def get_playlist(self, playlist_id, additional_type=None, fields=None, market=None) -> dict:
+    def get_playlist(self, playlist_id, additional_type : str = None, fields : str = None, market : str = None) -> dict:
         """
         Return an object with playlist information
         - Parameters:
@@ -105,7 +104,7 @@ class Spotrend(metaclass=Singleton):
         pattern = re.compile(r"(\w+\.)?\w+\(\w+(\,\w+)*\)")
         return bool(pattern.match(fields))
 
-    def get_resource(self, lookup_id: str, type: str,  queries={}) -> dict:
+    def get_resource(self, lookup_id: str, type: str,  queries : dict = {}) -> dict:
         """
         Fundamental method to retrieve a resource of a specific type with optional query
         - Parameters:
@@ -130,7 +129,7 @@ class Spotrend(metaclass=Singleton):
             endpoint = endpoint[:-1]
         return self._call_api("get", endpoint, headers)
 
-    def get_several_resources(self, lookup_ids: list[str], type: str, queries={}) -> dict:
+    def get_several_resources(self, lookup_ids: list[str], type: str, queries : dict = {}) -> dict:
         """
         Fundamental method to retrieve a batch response on multiple resources request
         of a specific type with optional query
