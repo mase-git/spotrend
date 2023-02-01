@@ -24,6 +24,7 @@ def authenticate(func):
         return func(*args, **kwargs)
     return wrapper
 
+
 class Client():
 
     def __init__(self, id=None, secret=None, redirect_uri=None):
@@ -31,19 +32,11 @@ class Client():
         self.id = id or os.getenv("SPOTREND_CLIENT_ID")
         self.secret = secret or os.getenv("SPOTREND_CLIENT_SECRET")
         self.redirect_uri = redirect_uri or os.getenv("SPOTREND_REDIRECT_URI")
-
-class AuthClient(Client):
-    pass
-
-class CredentialsClient(Client):
-
-    def __init__(self, id=None, secret=None):
-        super().__init__(id, secret)
         self.access_token = None
         self.access_token_expires = None
         self.access_token_did_expire = True
-        self.scope = "default"
-        self.version = "v1"
+        self.scope = None
+        self.refresh_token = None
         self.access_token_url = "https://accounts.spotify.com/api/token"
         self.headers = None
 
@@ -54,6 +47,8 @@ class CredentialsClient(Client):
         """
         id = self.id
         secret = self.secret
+        print(id)
+        print(secret)
         client_creds = f"{id}:{secret}"
         client_creds_b64 = base64.b64encode(client_creds.encode())
         return client_creds_b64.decode()
