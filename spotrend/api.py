@@ -51,10 +51,10 @@ class Spotrend(metaclass=Singleton):
             the official Spotify API documentation at:  
             https://developer.spotify.com/documentation/web-api/reference/#/operations/get-track
         """
-        query = {}
+        param = {}
         if market != None:
-            query['market'] = market
-        return self.get_resource(track_id, "tracks", queries=query)
+            param['market'] = market
+        return self.get_resource(track_id, "tracks", params=param)
 
     def get_album(self, album_id: str, market : str = None) -> dict:
         """
@@ -69,10 +69,10 @@ class Spotrend(metaclass=Singleton):
             the official Spotify API documentation at:  
             https://developer.spotify.com/documentation/web-api/reference/#/operations/get-an-album
         """
-        query = {}
+        param = {}
         if market != None:
-            query['market'] = market
-        return self.get_resource(album_id, "albums", queries=query)
+            param['market'] = market
+        return self.get_resource(album_id, "albums", params=param)
 
     def get_playlist(self, playlist_id, additional_type : str = None, fields : str = None, market : str = None) -> dict:
         """
@@ -87,30 +87,30 @@ class Spotrend(metaclass=Singleton):
             the official Spotify API documentation at:  
             https://developer.spotify.com/documentation/web-api/reference/#/operations/get-playlist
         """
-        query = {}
+        param = {}
         if additional_type != None and additional_type.lower() in ("track", "episode"):
-            query["additional_type"] = additional_type.lower()
+            param["additional_type"] = additional_type.lower()
         if fields != None and self._field_regex(fields):
-            query['fields'] = fields.lower()
+            param['fields'] = fields.lower()
         if market != None:
-            query['market'] = market
-        return self.get_resource(playlist_id, "playlists", queries=query)
+            param['market'] = market
+        return self.get_resource(playlist_id, "playlists", params=param)
 
     def _field_regex(self, fields: str) -> bool:
         """
-        Regex checker for the fields parameter available in some queries
+        Regex checker for the fields parameter available in some params
         """
         # limited control caused by pumping-lemma
         pattern = re.compile(r"(\w+\.)?\w+\(\w+(\,\w+)*\)")
         return bool(pattern.match(fields))
 
-    def get_resource(self, lookup_id: str, type: str,  queries : dict = {}) -> dict:
+    def get_resource(self, lookup_id: str, type: str,  params : dict = {}) -> dict:
         """
-        Fundamental method to retrieve a resource of a specific type with optional query
+        Fundamental method to retrieve a resource of a specific type with optional param
         - Parameters:
             - lookup_id (str): the lookup id of the resource
             - type (str): the type of the resource
-            - queries (dict): a dictionary key-value for the input query fields
+            - params (dict): a dictionary key-value for the input param fields
         - Returns:
             - dict : object with information about the required resource
         - Documentation:
@@ -122,21 +122,18 @@ class Spotrend(metaclass=Singleton):
         endpoint = f"https://api.spotify.com/{self.version}/{type}/{lookup_id}?"
         if type not in items or lookup_id == None:
             raise SpotrendInvalidDataError('The type of data is invalid.')
-        for name, value in queries.items():
-            endpoint = f"{endpoint}&{name}={value}"
-        headers = self.client.get_resource_header()
         if endpoint[-1] == '?':
             endpoint = endpoint[:-1]
-        return self._call_api("get", endpoint, headers)
+        return self.client.make_request(endpoint=endpoint, method="GET", params=params)
 
-    def get_several_resources(self, lookup_ids: list[str], type: str, queries : dict = {}) -> dict:
+    def get_several_resources(self, lookup_ids: list[str], type: str, params : dict = {}) -> dict:
         """
         Fundamental method to retrieve a batch response on multiple resources request
-        of a specific type with optional query
+        of a specific type with optional param
         - Parameters:
             - lookup_ids (list): the lookup ids related to the batch resources
             - type (str): the type of the resource
-            - queries (dict): a dictionary key-value for the input query fields
+            - params (dict): a dictionary key-value for the input param fields
         - Returns:
             - dict : object with information about the required resource
         - Documentation:
@@ -148,14 +145,9 @@ class Spotrend(metaclass=Singleton):
         if len(lookup_ids) == 0 or type not in items:
             raise SpotrendInvalidDataError(
                 'You need to specify a spotify ID, URI or URL.')
-        first = lookup_ids.pop(0)
-        endpoint = f"https://api.spotify.com/{self.version}/{type}?ids={first}"
-        for lookup_id in lookup_ids:
-            endpoint += f",{lookup_id}"
-        for name, value in queries.items():
-            endpoint = f"{endpoint}&{name}={value}"
-        headers = self.client.get_resource_header()
-        return self._call_api("get", endpoint, headers)
+        endpoint = f"https://api.spotify.com/{self.version}/{type}"
+        params['ids'] = lookup_ids
+        return self.client.make_request(endpoint, method="GET", params=params)
 
     def get_available_resource(self, type: str) -> dict:
         """
@@ -168,17 +160,7 @@ class Spotrend(metaclass=Singleton):
             - dict : an object with the list of available resource's items
         """
         endpoint = f"https://api.spotify.com/{self.version}/{type}"
-        headers = self.client.get_resource_header()
-        return self._call_api("get", endpoint, headers)
+        return self.client.make_request(endpoint, method="GET")
 
-    @staticmethod
-    def _call_api(method: str, endpoint: str, headers: dict, data=None) -> dict:
-        method = method.lower()
-        response = requests.api.request(
-            method, endpoint, headers=headers, data=data)
-        if response.status_code not in range(200, 299):
-            err = json.loads(response.text)
-            message = f"Error {err['error']['status']} - {err['error']['message']}"
-            raise SpotrendRequestError(message)
-        else:
-            return json.loads(response.text)
+
+    

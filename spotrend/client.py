@@ -186,6 +186,5 @@ class Client(metaclass=Singleton):
                 method, url, headers=headers, params=params, json=data)
         if response.status_code == 200:
             return response.json()
-        else:
-            raise SpotrendRequestError(
-                f"Request failed with status code {response.status_code}")
+        print(response)
+        return response.json()
