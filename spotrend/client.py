@@ -5,12 +5,11 @@ import os
 import json
 import urllib
 import webbrowser
-import atexit
 from dotenv import load_dotenv
 from functools import wraps
 from six import b 
 from six.moves import BaseHTTPServer
-from spotrend.data import *
+from spotrend.items import *
 from spotrend.exceptions import *
 from spotrend.pattern import *
 

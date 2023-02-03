@@ -24,6 +24,12 @@ class Spotrend(metaclass=Singleton):
         """
         return self.get_available_resource("recommendations/available-genre-seeds")
 
+    def get_available_devices(self):
+        """
+        Return an object with the list of available devices
+        """
+        return self.get_available_resource("/me/player/devices")
+        
     def get_artist(self, artist_id: str) -> dict:
         """
         Return an object with artist information
@@ -43,7 +49,7 @@ class Spotrend(metaclass=Singleton):
         Return an object with track information
         - Parameters:
             - track_id (str) : the urn, uri or id of the track
-            - market (str) : optional parameter for data filtering on a specific market
+            - market (str) : optional parameter for data filtering on a specific ISO 3166-1 alpha-2 country code
         - Returns:
             - dict : Spotify track information
         - Documentation:
@@ -61,7 +67,7 @@ class Spotrend(metaclass=Singleton):
         Return an object with album information
         - Parameters:
             - album_id (str) : the urn, uri or id of the album
-            - market (str) : optional parameter for data filtering on a specific market
+            - market (str) : optional parameter for data filtering on a specific ISO 3166-1 alpha-2 country code
         - Returns:
             - dict : Spotify album information
         - Documentation:
@@ -79,7 +85,7 @@ class Spotrend(metaclass=Singleton):
         Return an object with playlist information
         - Parameters:
             - playlist_id (str) : the urn, uri or id of the playlist
-            - market (str) : optional parameter for data filtering on a specific market
+            - market (str) : optional parameter for data filtering on a specific ISO 3166-1 alpha-2 country code
         - Returns:
             - dict : Spotify album information
         - Documentation:
@@ -95,6 +101,73 @@ class Spotrend(metaclass=Singleton):
         if market != None:
             param['market'] = market
         return self.get_resource(playlist_id, "playlists", params=param)
+    
+    def get_episode(self, episode_id, market : str = None) -> dict:
+        """
+        Return an object with episode information
+        - Parameters:
+            - episode_id (str) : the urn, uri or id of the episode
+            - market (str) : optional parameter for data filtering on a specific ISO 3166-1 alpha-2 country code
+        - Returns:
+            - dict : Spotify episode information
+        - Documentation:
+            - If you want to check the structure of the response, check 
+            the official Spotify API documentation at:  
+            https://developer.spotify.com/documentation/web-api/reference/#/operations/get-an-episode
+        """
+        param = {}
+        if market != None:
+            param['market'] = market
+        return self.get_resource(episode_id, "episodes", params=param)
+
+    def get_chapter(self, chapter_id, market : str = None) -> dict:
+        """
+        Return an object with chapter information
+        - Parameters:
+            - chapter_id (str) : the urn, uri or id of the chapter
+            - market (str) : optional parameter for data filtering on a specific ISO 3166-1 alpha-2 country code
+        - Returns:
+            - dict : Spotify chapter information
+        - Documentation:
+            - If you want to check the structure of the response, check 
+            the official Spotify API documentation at:  
+            https://developer.spotify.com/documentation/web-api/reference/#/operations/get-a-chapter
+        """
+        param = {}
+        if market != None:
+            param['market'] = market
+        return self.get_resource(chapter_id, "chapters", params=param)
+
+    def get_single_category(self, category_id, country : str = None, locale : str = None):
+        """
+        Return an object with chapter information
+        - Parameters:
+            - category_id (str) : the urn, uri or id of the chapter
+            - country (str) : optional parameter with an ISO 3166-1 alpha-2 country code. Provide this parameter to ensure that the category exists for a particular country.
+            - locale (str) : optional parameter for desidered language, consisting of an  ISO 639-1 language code and an ISO 3166-1 alpha-2 country code, joined by an underscore. 
+        - Returns:
+            - dict : Spotify category information
+        - Documentation:
+            - If you want to check the structure of the response, check 
+            the official Spotify API documentation at:  
+            https://developer.spotify.com/documentation/web-api/reference/#/operations/get-a-category
+        """
+        param = {}
+        if country != None:
+            param['country'] = country
+        if locale != None:
+            param['locale'] = locale
+        return self.get_resource(category_id, "browse/categories", params=param)
+
+    def get_profile(self):
+        """
+        Get current user profile info
+        - Returns:
+            - dict : the logged account profile information
+        """
+        endpoint = f"https://api.spotify.com/{self.version}/me"
+        return self.client.make_request(endpoint, method="GET")
+
 
     def _field_regex(self, fields: str) -> bool:
         """
