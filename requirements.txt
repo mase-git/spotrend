@@ -25,7 +25,7 @@ hatchling==1.12.2
 idna==3.4
 importlib-metadata==6.0.0
 ipykernel==6.20.1
-ipython==8.8.0
+ipython==8.10.0
 jaraco.classes==3.2.3
 jedi==0.18.2
 joblib==1.2.0
