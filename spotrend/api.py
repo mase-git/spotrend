@@ -1,5 +1,7 @@
+import logging
 from spotrend.client import *
 from spotrend.pattern import *
+from spotrend.exceptions import *
 import re
 
 
