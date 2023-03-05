@@ -134,6 +134,20 @@ class Spotrend(metaclass=Singleton):
         return self.get_several_resources(album_ids, "albums", params=param)
 
     def get_album_tracks(self, album_id: str, market: str = None, limit: int = 20, offset: int = 0) -> dict:
+        """
+        Get Spotify catalog information about an album’s tracks. Optional parameters can be used to limit the number of tracks returned.
+        - Parameters:
+            - album_id (list) : list of urn, uri or id of the albums
+            - market (str) : optional parameter for data filtering on a specific ISO 3166-1 alpha-2 country code
+            - limit (int): The maximum number of items to return. Default: 20. Minimum: 1. Maximum: 50.
+            - offset (int): The index of the first item to return. Default: 0 (the first item). Use with limit to get the next set of items.
+        - Returns:
+            - dict : collection of Spotify album information
+        - Documentation:
+            - If you want to check the structure of the response, check 
+            the official Spotify API documentation at:  
+            https://developer.spotify.com/documentation/web-api/reference/#/operations/get-multiple-albums
+        """
         params = {"limit": limit, "offset": offset}
         if market != None:
             params['market'] = market
@@ -144,6 +158,18 @@ class Spotrend(metaclass=Singleton):
         return self.client.make_request(endpoint, method="GET", params=params)
 
     def get_user_saved_albums(self, limit: int = 20, market: str = None, offset: int = 0) -> dict:
+        """
+        Return the user saved albums 
+        - Parameters:
+            - limit (int): The maximum number of items to return. Default: 20. Minimum: 1. Maximum: 50.
+            - market (str): optional parameter for data filtering on a specific ISO 3166-1 alpha-2 country code
+        - Returns:
+            - dict: collection of Spotify saved albums for the current logged user
+        - Documentation:
+            - If you want to check the structure of the response, check 
+            the official Spotify API documentation at:  
+            https://developer.spotify.com/documentation/web-api/reference/#/operations/get-users-saved-albums
+        """
         params = {"limit": limit, "offset": offset}
         if market != None:
             params['market'] = market
@@ -154,23 +180,70 @@ class Spotrend(metaclass=Singleton):
         return self.client.make_request(endpoint, method="GET", params=params)
 
     def save_albums_for_current_user(self, album_ids: list = []) -> dict:
+        """
+        Save albums for the current user inside the "Your Music" libraries
+        - Parameters:
+          - album_ids (list): list of albums ids to save in the "Your Music" library
+        - Returns:
+            - dict:  The status code of the saving operation
+        - Documentation:
+            - If you want to check the structure of the response, check 
+            the official Spotify API documentation at:  
+            https://developer.spotify.com/documentation/web-api/reference/#/operations/save-albums-user
+        """
         data = {"ids": album_ids}
         params = data
         endpoint = f"https://api.spotify.com/{self.version}/me/albums"
         return self.client.make_request(endpoint, method="PUT", params=params, data=data)
 
     def remove_user_saved_album(self, album_ids: list = []) -> dict:
+        """
+        Remove albums for the current user inside the "Your Music" libraries
+        - Parameters:
+          - album_ids (list): list of albums ids to save in the "Your Music" library
+        - Returns:
+            - dict:  The status code of the saving operation
+        - Documentation:
+            - If you want to check the structure of the response, check 
+            the official Spotify API documentation at:  
+            https://developer.spotify.com/documentation/web-api/reference/#/operations/save-albums-user
+        """   
         data = {"ids": album_ids}
         params = data
         endpoint = f"https://api.spotify.com/{self.version}/me/albums"
         return self.client.make_request(endpoint, method="DELETE", params=params, data=data)
 
     def check_user_saved_albums(self, albums_ids: list = []) -> list:
+        """
+        Check if a collection of albums ids is inside the "Your Music" library of the current logged user
+        - Parameters:
+            - albums_ids: id of albums to check if exists inside the "Your Music" 
+        - Returns:
+            - list: collection of booleans with True or False that indicates if the i-th album is present or not
+        - Documentation:
+            - If you want to check the structure of the response, check 
+            the official Spotify API documentation at:  
+            https://developer.spotify.com/documentation/web-api/reference/#/operations/check-users-saved-albums
+        """
         params = {"ids": albums_ids}
         endpoint = "https://api.spotify.com/v1/me/albums/contains"
         return self.client.make_request(endpoint, method="GET", params=params)
 
     def get_new_releases(self, country: str = None, limit: int = 20, offset: int = 0) -> dict:
+        """
+        Get a list of new album releases featured in Spotify (shown, for example, on a Spotify player’s “Browse” tab).
+        - Parameters:
+            - country (str): A country: an ISO 3166-1 alpha-2 country code. Provide this parameter if you want the list of returned items 
+            to be relevant to a particular country. If omitted, the returned items will be relevant to all countries.
+            - limit (int): The maximum number of items to return. Default: 20. Minimum: 1. Maximum: 50.
+            - offset (int): The index of the first item to return. Default: 0 (the first item). Use with limit to get the next set of items.
+        - Returns:
+            - dict: A paged set of albums
+       - Documentation:
+            - If you want to check the structure of the response, check 
+            the official Spotify API documentation at:  
+            https://developer.spotify.com/documentation/web-api/reference/#/operations/get-new-releases
+        """
         params = {"limit": limit, "offset": offset}
         if country != None:
             params['country'] = country
