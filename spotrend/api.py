@@ -133,6 +133,41 @@ class Spotrend(metaclass=Singleton):
             param['market'] = market
         return self.get_several_resources(album_ids, "albums", params=param)
 
+    def get_artist_top_tracks(self, artist_id : str, market : str = None) -> dict:
+        """
+        Get Spotify catalog information about an artist's top tracks by country.
+        - Parameters:
+            - artist_id (str): urn, uri or id of the artist
+            - market (str): optional parameter for data filtering on a specific ISO 3166-1 alpha-2 country code
+        - Returns:
+            - dict: a set of tracks from the input artist 
+        - Documentation:
+            - If you want to check the structure of the response, check 
+            the official Spotify API documentation at:  
+            https://developer.spotify.com/documentation/web-api/reference/#/operations/get-artist-top-tracks     
+        """
+        params = {}
+        if market != None:
+            params['market'] = market
+        endpoint = f"https://api.spotify.com/{self.version}/artists/{artist_id}/top-tracks"
+        return self.client.make_request(endpoint, method="GET", params=params)
+
+    def get_artist_related_artist(self, artist_id : str) -> dict:
+        """
+            Get Spotify catalog information about artists similar to a given artist. 
+            Similarity is based on analysis of the Spotify community's listening history.        
+        - Parameters:
+            - artist_id (str): urn, uri or id of the artist
+        - Returns:
+            - dict: a set of related artists from the input artist 
+        - Documentation:
+            - If you want to check the structure of the response, check 
+            the official Spotify API documentation at:  
+            https://developer.spotify.com/documentation/web-api/reference/#/operations/get-an-artists-related-artists
+        """
+        endpoint = f"https://api.spotify.com/{self.version}/artists/{artist_id}/related-artists"
+        return self.client.make_request(endpoint, method="GET")
+
     def get_album_tracks(self, album_id: str, market: str = None, limit: int = 20, offset: int = 0) -> dict:
         """
         Get Spotify catalog information about an album’s tracks. Optional parameters can be used to limit the number of tracks returned.
@@ -468,3 +503,4 @@ class Spotrend(metaclass=Singleton):
         """
         endpoint = f"https://api.spotify.com/{self.version}/{type}"
         return self.client.make_request(endpoint, method="GET")
+
