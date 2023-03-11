@@ -368,6 +368,50 @@ class Spotrend(metaclass=Singleton):
             param['market'] = market
         return self.get_several_resources(episode_ids, "episodes", params=param)
 
+    def save_episodes_for_current_user(self, episode_ids: list = []) -> bool:
+        """
+        Save one or more episodes for the current user
+        - Parameters:
+            - episode_ids (list) : list of urn, uri or id of the episodes
+        - Returns:
+            - bool : True if the operation was successful, False otherwise
+        """
+        params = {"ids": episode_ids}
+        endpoint = "https://api.spotify.com/v1/me/episodes"
+        return self.client.make_request(endpoint, method="PUT", params=params)
+    
+    def remove_user_saved_episodes(self, episode_ids: list = []) -> bool:
+        """
+        Remove one or more episodes for the current user
+        - Parameters:
+            - episode_ids (list) : list of urn, uri or id of the episodes
+        - Returns:
+            - bool : True if the operation was successful, False otherwise
+        - Documentation:
+            - If you want to check the structure of the response, check 
+            the official Spotify API documentation at:
+            https://developer.spotify.com/documentation/web-api/reference/#/operations/remove-user-saved-episodes
+        """
+        params = {"ids": episode_ids}
+        endpoint = "https://api.spotify.com/v1/me/episodes"
+        return self.client.make_request(endpoint, method="DELETE", params=params)
+    
+    def check_user_saved_episodes(self, episodes_ids: list = []) -> list:
+        """
+        Check one or more episodes for the current user
+        - Parameters:
+            - episodes_ids (list) : list of urn, uri or id of the episodes
+        - Returns:
+            - list : list of urn, uri or id of the episodes
+        - Documentation:
+            - If you want to check the structure of the response, check 
+            the official Spotify API documentation at:
+            https://developer.spotify.com/documentation/web-api/reference/#/operations/check-user-saved-episodes
+        """
+        params = {"ids": episodes_ids}
+        endpoint = "https://api.spotify.com/v1/me/episodes/contains"
+        return self.client.make_request(endpoint, method="GET", params=params)
+        
     def get_chapter(self, chapter_id, market: str = None) -> dict:
         """
         Return an object with chapter information
@@ -529,13 +573,13 @@ class Spotrend(metaclass=Singleton):
             raise SpotrendQuotaError("The maximum number of shows is 50")
         return self.client.make_request(f"https://api.spotify.com/{self.version}/me/shows", method="DELETE", params=json.dumps(show_ids)) != None
 
-    def check_user_saved_shows(self, show_ids : list) -> bool:
+    def check_user_saved_shows(self, show_ids : list) -> list:
         """
         Check if a list of shows is in the current user's saved shows
         - Parameters:
             - show_ids (list) : list of urn, uri or id of the shows
         - Returns: 
-            - bool : True if the request was successful
+            - list : list of boolean values, True if the show is in the user's saved shows
         - Documentation:
             - If you want to check the structure of the response, check the official Spotify API documentation:
             https://developer.spotify.com/documentation/web-api/reference/#/operations/check-users-saved-shows
