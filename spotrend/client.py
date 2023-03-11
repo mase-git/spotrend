@@ -64,7 +64,7 @@ class ServerAuth(BaseHTTPServer.HTTPServer, metaclass=Singleton):
 
 class Client(metaclass=Singleton):
 
-    def __init__(self, client_id: str = None, client_secret: str = None, redirect_uri: str = None):
+    def __init__(self, client_id: str = None, client_secret: str = None, redirect_uri: str = None, default : bool = True):
         load_dotenv()
         self.client_id = client_id or os.getenv('SPOTREND_CLIENT_ID')
         self.client_secret = client_secret or os.getenv(
@@ -109,7 +109,8 @@ class Client(metaclass=Singleton):
             - SpotrendAuthError - in case there is some troubleshooting with the authentication in the client level
         """
         auth_url = self.get_authorization_url()
-        webbrowser.open(auth_url)
+        if not self.default:
+            webbrowser.open(auth_url)
         self.server.start()
         self.authorization_code = self.server.authorization_code
         self.request_token()
@@ -185,5 +186,4 @@ class Client(metaclass=Singleton):
                 method, url, headers=headers, params=params, json=data)
         if response.status_code == 200:
             return response.json()
-        print(response)
-        return response.json()
+        return None
